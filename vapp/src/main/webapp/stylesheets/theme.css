@@ -186,9 +186,9 @@ label {
   height:100px; 
   overflow:auto;
   background: #fff;
-  margin-left: 240px;
+  margin-left: 150px;
   border-left: 1px solid #cccccc;
-  padding: 15px 15px 0px 15px;
+  padding: 10px 15px 0px 15px;
 }
 .header {
   background: #fff;
@@ -386,7 +386,7 @@ a.panel-heading:hover,
 }
 /*Navigation*/
 .sidebar-nav {
-  width: 240px;
+  width: 150px;
   position: absolute;
   float: left;
   border-top: none;
