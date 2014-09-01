@@ -181,7 +181,10 @@ label {
 }
 .content {
   position: relative;
-  min-height: 800px;
+  /*max-height: 650px;*/
+  min-height: 650px;
+  height:100px; 
+  overflow:auto;
   background: #fff;
   margin-left: 240px;
   border-left: 1px solid #cccccc;
@@ -222,17 +225,16 @@ label {
 .page-content {
   padding: 1em;
 }
-footer {
-  padding: 1em;
-  margin-top: 4em;
+.footer {
+  padding-right: 40px;
+  padding-left: 40px;
+  /*margin-top: 4em;*/
   color: #666;
   font-size: .85em;
-  line-height: 1.3em;
-  margin: 4em -3px 0em -3px;
+  line-height: 0;
+  /*margin: 4em -3px 0em -3px;*/
 }
-footer hr {
-  margin: 2em -2em;
-}
+
 .nav-tabs > li {
   margin-bottom: -2px;
 }
