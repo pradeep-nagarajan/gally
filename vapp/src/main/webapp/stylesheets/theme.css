@@ -17,6 +17,7 @@ body {
   background-repeat: initial initial;
   margin: 0px;
   padding: 0px;
+  font-size: 12px !important;
 }
 body,
 h1,
@@ -182,7 +183,7 @@ label {
 .content {
   position: relative;
   /*max-height: 650px;*/
-  min-height: 650px;
+  min-height: 530px;
   height:100px; 
   overflow:auto;
   background: #fff;
@@ -309,7 +310,7 @@ label {
   margin-bottom: 0px;
   text-shadow: none;
   text-transform: none;
-  font-size: .85em;
+  font-size: 1em;
   line-height: 1.5em;
   background: #efefef;
   background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #efefef), color-stop(1, #fafafa));

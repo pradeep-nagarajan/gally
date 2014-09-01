@@ -20,7 +20,12 @@
 <script type="text/javascript">
 	$(function() {
 		$(".knob").knob();
+		
+		//alert($( window ).height());
 	});
+	$( window ).resize(function() {
+		$("#content").css('min-height',($( window ).height()-111));
+		});
 </script>
 
 
@@ -182,7 +187,7 @@
 		</ul>
 	</div>
 
-	<div class="content">
+	<div class="content" id="content">
 		<div class="header">
 			<div class="stats">
 				<p class="stat">
