@@ -1,0 +1,105 @@
+
+create table VAAP_GROUP_MASTER (GRP_MST_ID number(10) primary key, MAIN_GRP varchar2(50),MIS_GRP varchar2(50),LEDGER varchar2(100),
+CONSTRAINT GRP_MST_unique UNIQUE (MAIN_GRP,MIS_GRP,LEDGER));
+
+create table VAAP_UPLOADED_TEMP (TXN_ID number(30) primary key, GRP_ID number(10), LEDGER varchar2(100), TXN_DATE DATE, CR_DR varchar2(2), AMOUNT NUMBER(20,2));
+
+
+create table VAAP_MASTER_DATA (TXN_ID number(30) primary key, GRP_ID number(10), TXN_DATE DATE, CR_DR varchar2(2), AMOUNT NUMBER(20,2),
+ CONSTRAINT vapp_grp_id
+    FOREIGN KEY (GRP_ID)
+    REFERENCES VAAP_GROUP_MASTER(GRP_MST_ID));
+
+select * from VAAP_UPLOADED_TEMP;
+
+CREATE SEQUENCE GRP_MST_seq
+  MINVALUE 1
+  MAXVALUE 9999999999
+  START WITH 1
+  INCREMENT BY 1
+  CACHE 20;
+  
+CREATE SEQUENCE MST_DATA_seq
+  MINVALUE 1
+  MAXVALUE 999999999999999999999999999
+  START WITH 1
+  INCREMENT BY 1
+  CACHE 20;
+  
+  
+SET DEFINE OFF;
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','COGS','EXP REIM EXP-OTHERS');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','COGS','Exp  Reim of Inflght Catering');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','COGS','EXP REIM OF LANDING & PARKING');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','COGS','Exp Reim O/S Allowances');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','COGS','Charter Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'IT','Connectivity','Internet Lease Line Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Courier & Postage','COURIER CHARGES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Depreciation','Depreciation','Depreciation');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Insurance - All Facility','Insurance Charges');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Insurance - All Facility','insurance Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Marketing & BD','Business Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Office Expenses','Office Others','BROKERAGE');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Office Expenses','Office Others','OFFICE EXPENSES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Office Expenses','Office Others','Sundry Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Office Expenses','Office Others','Water Charges');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Office Expenses','Office Others','Electricity');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Office Expenses','Office Rent','Office Rent');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','Other Direct','CUSTOMS DUTY');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','Other Direct','Maintenance & Engineering Exp');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','Other Direct','First Aid Kit Charges');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue Related','Other Direct','DGCA FEES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','Bank Charges');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','Interest on TDS');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','Medical Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','Interest on Service Tax');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','S.T. on Trading');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','Foreign Exchange Fluctuations');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','Pooja Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','TDS Expenses (DIFF AMT-EAG DUBAI)');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Other Expenses','AIRPORT PERMIT');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'IT','Other IT expenses','Computer - Software');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Others','ROUND OFF');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Professional','Legal & Professional Exps.');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Professional','OTHER CONSULTANCY');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Others','Professional','Recruitment Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Charter Hours','SALES OPS SERVICES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Fixed Monthly Charge','SALES MGT FEES-FW');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Fixed Monthly Charge','SALES MGT FEES- RW');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Reimbursements','REIM OF EXP -OTHERS');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Reimbursements','REIM OF INFLIGHT CATERING');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Reimbursements','REIM OF O/S ALLOWANCES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Reimbursements','Remb of Landing and Parking');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Revenue','Revenue - Reimbursements','Charter Fees');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','Employers Contribution to PF');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','Employers Contribution to LWF');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','Salary');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','Exp Reim of Salary');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','REIM OF SALARY');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','Outsourced Man Power');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Salary','Leave Salary');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Staff Expenses','Uniform Expenses');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Staff Expenses','BUSINESS LUNCH');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Staff Expenses','Lunch & Others');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Staff Expenses','Bonus');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Stationary & Printing','Printing');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Stationary & Printing','stationery');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Stationary & Printing','Xerox Charges');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Telecommunication','MOBILE EXPENSES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Telecommunication','Tele Reimbursement');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Telecommunication','Landline Telephones');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Other Establishment','Telecommunication','Telecom Amc');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Training','Staff Training Expenses- International');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','Travel Expenses- International');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','VISA FEES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','LOCAL CONVEYANCE');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','Out Station Allowances');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','CAR HIRE CHARGES');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','TICKETS-DOMESTIC');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','TRAVEL- DOMESTIC');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','Vehicle - Fuel & Oil');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','VEHICLE REAPR  & MAINTENANCE');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','Hotel-Domestic');
+insert into VAAP_GROUP_MASTER VALUES (GRP_MST_seq.nextval,'Manpower','Travel & Living','Car Parking');
+
+COMMIT;
