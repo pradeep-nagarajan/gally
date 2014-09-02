@@ -41,7 +41,7 @@ public class FileUploadController extends DefaultHandlerExceptionResolver {
 			message = "Incorrect File cannot be uploaded!";
 		}else {
 			try {
-			serverFile = new File("/tmp/" + txnDate+file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")));
+			serverFile = new File("./" + txnDate+file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")));
 			BufferedOutputStream stream = new BufferedOutputStream(
 				        new FileOutputStream(serverFile));
 			
@@ -54,8 +54,9 @@ public class FileUploadController extends DefaultHandlerExceptionResolver {
 			}finally{
 				
 			}
+			System.out.println(serverFile.getAbsolutePath());
 			ReadExcelDemo red=new ReadExcelDemo();
-			red.readAndInsert(txnDate);
+			red.readAndInsert(txnDate, serverFile.getAbsolutePath());
 		}
 		mav.setViewName("message.jsp?message="+message);
 		return mav;
