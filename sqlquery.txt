@@ -9,12 +9,10 @@ create table VAPP_MASTER_DATA (TXN_ID number(30) primary key, GRP_ID number(10),
  CONSTRAINT vapp_grp_id
     FOREIGN KEY (GRP_ID)
     REFERENCES VAPP_GROUP_MASTER(GRP_MST_ID));
+    
+create table VAPP_IGNORE_LEDGER(LEDGER varchar2(100) primary key);    
 
 select * from VAPP_UPLOADED_TEMP;
-
-alter table VAAP_UPLOADED_TEMP rename to VAPP_UPLOADED_TEMP;
-
-alter table VAAP_GROUP_MASTER rename to VAPP_GROUP_MASTER;
 
 CREATE SEQUENCE GRP_MST_seq
   MINVALUE 1

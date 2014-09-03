@@ -11,12 +11,11 @@
 <link rel="stylesheet" type="text/css"
 	href="lib/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
-<link href="stylesheets/jquery-ui.css" rel="stylesheet" />
+
 <script src="lib/jquery-1.11.1.min.js" type="text/javascript"></script>
-<script src="lib/jquery-ui.js" type="text/javascript"></script>
+<script src="lib/ajaxcall.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="stylesheets/theme.css">
 <link rel="stylesheet" type="text/css" href="stylesheets/premium.css">
-<link rel="stylesheet" type="text/css" href="stylesheets/vapp.css">
 
 </head>
 <body class=" theme-blue">
@@ -38,20 +37,60 @@
 			$('[data-popover="true"]').popover({
 				html : true
 			});
-
+			$( window ).resize(function() {
+				$("#content").css('min-height',($( window ).height()-111));
+				});
+			getJson('/vapp/ignoreledger', 'ignore');
 		});
-		$( window ).resize(function() {
-			$("#content").css('min-height',($( window ).height()-111));
-			$("#content").css('min-width',($( window ).width()-150));
-			});
+		var ignoreLedgerArr=[];
+		function ignoreDataPush(data){
+			ignoreLedgerArr=data.ignoreList;
+			var recCount=5;
+			if(ignoreLedgerArr.length<5)
+				recCount=ignoreLedgerArr.length;
+			$("#tabbody").empty();
+			for(i=1;i<=recCount;i++){
+				$("#tabbody").append('<tr><td>'+i+'</td>'+
+				'<td>'+ignoreLedgerArr[i-1]+'</td>'+
+				'<td><a href="user.html"><i class="fa fa-pencil"></i></a> '+
+				'<a href="javascript:deleteData('+i+')"><i class="fa fa-trash-o"></i></a></td></tr>');
+			}
+			
+			$("#paginate").empty();
+			if(Math.ceil(ignoreLedgerArr.length/5)>1){
+				$("#paginate").append('<li><a href="javascript:findPageData(1)">&laquo;</a></li>');
+				for(i=1;i<=Math.ceil(ignoreLedgerArr.length/5);i++){
+					$("#paginate").append('<li><a href="javascript:findPageData('+i+')">'+i+'</a></li>')
+				}
+				$("#paginate").append('<li><a href="javascript:findPageData('+Math.ceil(ignoreLedgerArr.length/5)+')">&raquo;</a></li>');	
+			}
+			
+		}
+		
+		function findPageData(pageNo){
+			$("#tabbody").empty();
+			for(i=((pageNo-1)*5)+1;i<=(pageNo*5) && i<=ignoreLedgerArr.length;i++){
+				$("#tabbody").append('<tr><td>'+i+'</td>'+
+						'<td>'+ignoreLedgerArr[i-1]+'</td>'+
+						'<td><a href="user.html"><i class="fa fa-pencil"></i></a> '+
+						'<a href="javascript:deleteData('+ignoreLedgerArr[i-1]+')" role="button" data-toggle="modal"><i class="fa fa-trash-o"></i></a></td></tr>');
+			}
+		}
+		function deleteData(ledger){
+			$('#delLedg').text(ignoreLedgerArr[i-1]);
+			$('#myModal').modal('show');
+		}
+		function sendDeleteData(){
+			alert('Deleted : '+ $('#delLedg').text())
+			
+		}
 		
 	</script>
 	<style type="text/css">
-
-.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
-	color: #fff;
-}
-</style>
+	.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
+		color: #fff;
+	}
+	</style>
 
 	<script type="text/javascript">
 		$(function() {
@@ -59,25 +98,12 @@
 			uls.addClass('visible-xs');
 			$('#main-menu').append(uls.clone());
 		});
-		
 	</script>
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-	<!-- Le fav and touch icons -->
-	<link rel="shortcut icon" href="../assets/ico/favicon.ico">
-	<link rel="apple-touch-icon-precomposed" sizes="144x144"
-		href="../assets/ico/apple-touch-icon-144-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" sizes="114x114"
-		href="../assets/ico/apple-touch-icon-114-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" sizes="72x72"
-		href="../assets/ico/apple-touch-icon-72-precomposed.png">
-	<link rel="apple-touch-icon-precomposed"
-		href="../assets/ico/apple-touch-icon-57-precomposed.png">
-
 
 	<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
 	<!--[if IE 7 ]> <body class="ie ie7 "> <![endif]-->
@@ -132,14 +158,14 @@
 			<li><ul class="dashboard-menu nav nav-list collapse in">
 					<li><a href="index.html"><span class="fa fa-caret-right"></span>
 							Main</a></li>
-					<li><a href="ignore.html"><span class="fa fa-caret-right"></span>
-							Ignore Ledger List</a></li>
+					<li class="active"><a href="ignore.html"><span
+							class="fa fa-caret-right"></span> Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
 					<li><a href="data-entry.html"><span
 							class="fa fa-caret-right"></span> Data Entry</a></li>
 					<li><a href="uploader.html"><span
-							class="fa fa-caret-right"></span> Upload Data</a></li>			
+							class="fa fa-caret-right"></span> Upload Data</a></li>		
 				</ul></li>
 
 			<li data-popover="true"
@@ -179,29 +205,59 @@
 	<div class="content" id="content">
 		<div class="header">
 
-			<h1 class="page-title">Data Entry</h1>
+			<h1 class="page-title">Users</h1>
 			<ul class="breadcrumb">
 				<li><a href="index.html">Home</a></li>
-				<li class="active">Message</li>
+				<li class="active">Users</li>
 			</ul>
 
 		</div>
 		<div class="main-content">
 
-			<div class="faq-content">
-				<div class="row">
-					<div class="col-sm-9 col-md-12">
+			<div class="btn-toolbar list-toolbar">
+				<button class="btn btn-primary">
+					<i class="fa fa-plus"></i> New Ignore Ledger
+				</button>
+				<button class="btn btn-default">Export</button>
+				<div class="btn-group"></div>
+			</div>
+			<table class="table" style="width: 40%;">
+				<thead>
+					<tr>
+						<th style="width: 3.5em;">#</th>
+						<th>Ledgers</th>
+						<th style="width: 3.5em;"></th>
+					</tr>
+				</thead>
+				<tbody id="tabbody">
+					
+				</tbody>
+			</table>
 
-						<div class="panel panel-default">
-							<p class="panel-heading">Message</p>
-							<div class="panel-body">
-								<%=request.getParameter("message")%>
-								<div style="text-align: right;">
-									<button class="btn btn-primary" onclick="index.html">Ok</button>
-								</div>
-							</div>
+			<ul class="pagination" id="paginate">
+				
+			</ul>
+
+			<div class="modal small fade" id="myModal" tabindex="-1"
+				role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">×</button>
+							<h3 id="myModalLabel">Delete Confirmation</h3>
 						</div>
-
+						<div class="modal-body">
+							<p class="error-text">
+								<i class="fa fa-warning modal-icon"></i>Are you sure you want to
+								delete the ledger - <font id="delLedg"></font>?<br>This cannot be undone.
+							</p>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-default" data-dismiss="modal"
+								aria-hidden="true">Cancel</button>
+							<button class="btn btn-danger" onclick="sendDeleteData()" data-dismiss="modal">Delete</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -217,16 +273,7 @@
 	<script src="lib/bootstrap/js/bootstrap.js"></script>
 	<script type="text/javascript">
 		$(function() {
-			$("#datepicker").datepicker({
-				showOn : "button",
-				buttonImageOnly : true,
-				buttonImage : 'images/calendar.gif'
-			});
-			$("#datepicker2").datepicker({
-				showOn : "button",
-				buttonImageOnly : true,
-				buttonImage : 'images/calendar.gif'
-			});
+			$("#content").css('min-height',($( window ).height()-111));
 		});
 	</script>
 

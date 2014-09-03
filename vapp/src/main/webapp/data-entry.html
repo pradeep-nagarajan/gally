@@ -8,8 +8,6 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700'
-	rel='stylesheet' type='text/css'>
 <link rel="stylesheet" type="text/css"
 	href="lib/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
@@ -49,17 +47,10 @@
 		
 	</script>
 	<style type="text/css">
-#line-chart {
-	height: 300px;
-	width: 800px;
-	margin: 0px auto;
-	margin-top: 1em;
-}
-
-.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
-	color: #fff;
-}
-</style>
+	.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
+		color: #fff;
+	}
+	</style>
 
 	<script type="text/javascript">
 		$(function() {
@@ -110,17 +101,6 @@
 	<!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-	<!-- Le fav and touch icons -->
-	<link rel="shortcut icon" href="../assets/ico/favicon.ico">
-	<link rel="apple-touch-icon-precomposed" sizes="144x144"
-		href="../assets/ico/apple-touch-icon-144-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" sizes="114x114"
-		href="../assets/ico/apple-touch-icon-114-precomposed.png">
-	<link rel="apple-touch-icon-precomposed" sizes="72x72"
-		href="../assets/ico/apple-touch-icon-72-precomposed.png">
-	<link rel="apple-touch-icon-precomposed"
-		href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
 
 	<!--[if lt IE 7 ]> <body class="ie ie6"> <![endif]-->
@@ -176,8 +156,8 @@
 			<li><ul class="dashboard-menu nav nav-list collapse in">
 					<li><a href="index.html"><span class="fa fa-caret-right"></span>
 							Main</a></li>
-					<li><a href="users.html"><span class="fa fa-caret-right"></span>
-							User List</a></li>
+					<li><a href="ignore.html"><span class="fa fa-caret-right"></span>
+							Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
 					<li class="active"><a href="data-entry.html"><span
@@ -309,6 +289,7 @@
 				buttonImageOnly : true,
 				buttonImage : 'images/calendar.gif'
 			});
+			$("#content").css('min-height',($( window ).height()-111));
 		});
 	</script>
 

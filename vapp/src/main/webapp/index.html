@@ -8,8 +8,6 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700'
-	rel='stylesheet' type='text/css'>
 <link rel="stylesheet" type="text/css"
 	href="lib/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
@@ -23,6 +21,7 @@
 		
 		//alert($( window ).height());
 	});
+	
 	$( window ).resize(function() {
 		$("#content").css('min-height',($( window ).height()-111));
 		});
@@ -56,17 +55,11 @@
 		});
 	</script>
 	<style type="text/css">
-#line-chart {
-	height: 300px;
-	width: 800px;
-	margin: 0px auto;
-	margin-top: 1em;
-}
-
-.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
-	color: #fff;
-}
-</style>
+	
+	.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
+		color: #fff;
+	}
+	</style>
 
 	<script type="text/javascript">
 		$(function() {
@@ -146,8 +139,8 @@
 			<li><ul class="dashboard-menu nav nav-list collapse in">
 					<li><a href="index.html"><span class="fa fa-caret-right"></span>
 							Main</a></li>
-					<li><a href="users.html"><span class="fa fa-caret-right"></span>
-							User List</a></li>
+					<li><a href="ignore.html"><span class="fa fa-caret-right"></span>
+							Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
 					<li><a href="data-entry.html"><span
@@ -423,6 +416,7 @@
 			$('.demo-cancel-click').click(function() {
 				return false;
 			});
+			$("#content").css('min-height',($( window ).height()-111));
 		});
 	</script>
 

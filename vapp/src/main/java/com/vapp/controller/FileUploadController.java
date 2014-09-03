@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,11 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
-import com.vapp.util.ReadExcelDemo;
+import com.vapp.service.VAPPService;
 
 @Controller
 public class FileUploadController extends DefaultHandlerExceptionResolver {
-
+	
+	@Autowired
+	VAPPService vappSrv;
 	
 	@RequestMapping(value="/fileUpload", method = RequestMethod.POST)
 	public ModelAndView fileUploaded(@RequestParam("txnDate") String txnDate,
@@ -55,8 +55,7 @@ public class FileUploadController extends DefaultHandlerExceptionResolver {
 				
 			}
 			System.out.println(serverFile.getAbsolutePath());
-			ReadExcelDemo red=new ReadExcelDemo();
-			red.readAndInsert(txnDate, serverFile.getAbsolutePath());
+			vappSrv.readAndInsert(txnDate, serverFile.getAbsolutePath());
 		}
 		mav.setViewName("message.jsp?message="+message);
 		return mav;
