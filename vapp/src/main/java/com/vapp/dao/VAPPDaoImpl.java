@@ -24,7 +24,10 @@ public class VAPPDaoImpl implements VAPPDao {
 	static final String EXISTS_SQL="SELECT 1 FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
 	static final String INSERT_TEMP_SQL="INSERT INTO VAPP_UPLOADED_TEMP VALUES(MST_DATA_seq.nextval, ?, ?, to_date(?,'DD/MM/RRRR'), ?, ?)";
 	static final String DELETE_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
+	static final String UPDATE_IGNORE_SQL="UPDATE VAPP_IGNORE_LEDGER SET LEDGER=? where LEDGER=?";
+	static final String INSERT_IGNORE_SQL="INSERT INTO VAPP_IGNORE_LEDGER values(?)";
 	static final String DEL_IGNORE_SQL="DELETE FROM VAPP_IGNORE_LEDGER WHERE LEDGER=?";
+	
 	
 	static Map<String, Integer> hm=new HashMap<String, Integer>();
 	static List<String> ignoreLedger=new ArrayList<String>();
@@ -115,7 +118,7 @@ public class VAPPDaoImpl implements VAPPDao {
 		}
     }
 	
-	public boolean deleteIgnoreLedger(String ledger){
+	public List<String> deleteIgnoreLedger(String ledger){
 		Connection conn=null;
 		PreparedStatement ps=null;
 		boolean result=false;
@@ -140,7 +143,64 @@ public class VAPPDaoImpl implements VAPPDao {
 				e.printStackTrace();
 			}
 		}
-    	return result;
+    	return ignoreLedger;
+	}
+	
+	public List<String> insertIgnoreLedger(String ledger){
+		Connection conn=null;
+		PreparedStatement ps=null;
+		boolean result=false;
+    	try {
+			conn = getVAPPConnection();
+			ps=conn.prepareStatement(INSERT_IGNORE_SQL);
+			ps.setString(1, ledger);
+			int i=ps.executeUpdate();
+			if(i>=1){
+				result=true;
+				getIgnoreLedgerList(conn);
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if(conn!=null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+    	return ignoreLedger;
+	}
+	
+	public List<String> updateIgnoreLedger(String ledger, String newLedger){
+		Connection conn=null;
+		PreparedStatement ps=null;
+		boolean result=false;
+    	try {
+			conn = getVAPPConnection();
+			ps=conn.prepareStatement(UPDATE_IGNORE_SQL);
+			ps.setString(1, newLedger);
+			ps.setString(2, ledger);
+			int i=ps.executeUpdate();
+			if(i>=1){
+				result=true;
+				getIgnoreLedgerList(conn);
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if(conn!=null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+    	return ignoreLedger;
 	}
 	
 	public int deleteTempData(String txnDate){

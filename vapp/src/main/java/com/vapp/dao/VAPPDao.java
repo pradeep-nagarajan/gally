@@ -11,9 +11,12 @@ public interface VAPPDao {
 	public boolean checkTempData(String txnDate, Connection conn);
 	public void getGroupMasterData(Connection conn);
 	public void getIgnoreLedgerList(Connection conn);
-	public boolean deleteIgnoreLedger(String ledger);
+	public List<String> deleteIgnoreLedger(String ledger);
+	public List<String> insertIgnoreLedger(String ledger);
+	public List<String> updateIgnoreLedger(String ledger, String newLedger);
 	public int deleteTempData(String txnDate);
 	public int insertTempData(Connection conn, MasterData md, Date txnDate);
 	public List<String> getIgnoreLedger();
 	public Connection getVAPPConnection() throws ClassNotFoundException, SQLException;
 }
+

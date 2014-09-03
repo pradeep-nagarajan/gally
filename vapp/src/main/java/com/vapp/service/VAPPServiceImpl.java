@@ -150,8 +150,37 @@ public class VAPPServiceImpl implements VAPPService
 		return hm;
 	}
 	
-	public boolean deleteIgnoreLedger(String ledger){
-		return vappDao.deleteIgnoreLedger(ledger);
+	public Map<String, Object> deleteIgnoreLedger(String ledger){
+		Map<String, Object> hm=new HashMap<String, Object>();
+		 
+		List<String> ignore = new ArrayList<String>();
+		ignore.addAll(vappDao.deleteIgnoreLedger(ledger));
+		ignore.remove(null);
+		ignore.remove("");
+		hm.put("ignoreList", ignore);
+		return hm;
+	}
+	
+	public Map<String, Object> insertIgnoreLedger(String ledger){
+		Map<String, Object> hm=new HashMap<String, Object>();
+		 
+		List<String> ignore = new ArrayList<String>();
+		ignore.addAll(vappDao.insertIgnoreLedger(ledger));
+		ignore.remove(null);
+		ignore.remove("");
+		hm.put("ignoreList", ignore);
+		return hm;
+	}
+	
+	public Map<String, Object> updateIgnoreLedger(String ledger, String newLedger){
+		Map<String, Object> hm=new HashMap<String, Object>();
+		 
+		List<String> ignore = new ArrayList<String>();
+		ignore.addAll(vappDao.updateIgnoreLedger(ledger, newLedger));
+		ignore.remove(null);
+		ignore.remove("");
+		hm.put("ignoreList", ignore);
+		return hm;
 	}
     
 }

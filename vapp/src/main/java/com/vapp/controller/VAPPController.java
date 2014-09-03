@@ -29,6 +29,28 @@ public class VAPPController {
 					HttpStatus.OK);
 	  }
 	 
+	 @RequestMapping(value = "/updateignoreledger", method = RequestMethod.GET)
+	  public @ResponseBody
+	  ResponseEntity deleteIgnoreLedgers(
+	      @RequestParam(value = "callback", required = true) String callback,
+	      @RequestParam(value = "ledger", required = true) String ledger,
+	      @RequestParam(value = "newledger", required = true) String newLedger,
+	      @RequestParam(value = "mode", required = true) String mode)
+	  {
+		if("D".equalsIgnoreCase(mode))
+			return new ResponseEntity(constructCallback(callback, vappSrv.deleteIgnoreLedger(ledger)), new HttpHeaders(),
+					HttpStatus.OK);
+		else if("I".equalsIgnoreCase(mode))
+			return new ResponseEntity(constructCallback(callback, vappSrv.insertIgnoreLedger(ledger)), new HttpHeaders(),
+					HttpStatus.OK);
+		else if("U".equalsIgnoreCase(mode))
+			return new ResponseEntity(constructCallback(callback, vappSrv.updateIgnoreLedger(ledger, newLedger)), new HttpHeaders(),
+					HttpStatus.OK);
+		else
+			return new ResponseEntity(constructCallback(callback, "Error"), new HttpHeaders(),
+					HttpStatus.OK);
+	  }
+	 
 	 public String constructCallback(String callback, Object data){
 		 StringBuffer theStringBuffer = new StringBuffer();
 		 Gson gson = new Gson();
