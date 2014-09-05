@@ -5,12 +5,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.vapp.model.GroupData;
 import com.vapp.service.VAPPService;
 
 @Controller
@@ -34,7 +36,7 @@ public class VAPPController {
 	  ResponseEntity deleteIgnoreLedgers(
 	      @RequestParam(value = "callback", required = true) String callback,
 	      @RequestParam(value = "ledger", required = true) String ledger,
-	      @RequestParam(value = "newledger", required = true) String newLedger,
+	      @RequestParam(value = "newledger", required = false) String newLedger,
 	      @RequestParam(value = "mode", required = true) String mode)
 	  {
 		if("D".equalsIgnoreCase(mode))
@@ -51,13 +53,23 @@ public class VAPPController {
 					HttpStatus.OK);
 	  }
 	 
-	 @RequestMapping(value = "/getTempData", method = RequestMethod.GET)
+	 @RequestMapping(value = "/gettempdata", method = RequestMethod.GET)
 	  public @ResponseBody
 	  ResponseEntity getTempData(
 	      @RequestParam(value = "callback", required = true) String callback)
 	  {
 		
 		 return new ResponseEntity(constructCallback(callback, vappSrv.getTempData()), new HttpHeaders(),
+					HttpStatus.OK);
+	  }
+	 
+	 @RequestMapping(value = "/insgrpdata", method = RequestMethod.POST)
+	  public @ResponseBody
+	  ResponseEntity insertGroupData(
+	      @RequestParam(value = "callback", required = false) String callback,@RequestBody GroupData groupData)
+	  {
+		
+		 return new ResponseEntity(constructCallback(callback, vappSrv.insertGroupMasterData(groupData)), new HttpHeaders(),
 					HttpStatus.OK);
 	  }
 	 

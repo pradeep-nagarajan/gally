@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.vapp.model.GroupData;
+
 public interface VAPPService {
 	public boolean readAndInsert(String fileName,String fileFullPath);
 	public void readXLS(Connection conn, Date txnDate, String fileFullPath);
@@ -13,4 +15,5 @@ public interface VAPPService {
 	public Map<String, Object> insertIgnoreLedger(String ledger);
 	public Map<String, Object> updateIgnoreLedger(String ledger, String newLedger);
 	public List<String> getTempData();
+	public boolean insertGroupMasterData(GroupData groupData);
 }

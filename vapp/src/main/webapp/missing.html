@@ -27,67 +27,62 @@
 			$( window ).resize(function() {
 				$("#content").css('min-height',($( window ).height()-111));
 				});
-			getJson('/vapp/getTempData', 'temp');
+			getJson('/vapp/gettempdata', 'temp');
 		});
 		var tempDataArr=[];
+		var rowKey;
 		function tempDataPush(data){
-			ignoreLedgerArr=data;
+			tempDataArr=data;
 			$("#tabbody").empty();
-			for(i=1;i<=recCount;i++){
-				$("#tabbody").append('<tr><td>'+i+'</td>'+
-				'<td><input type="text" id="'+ignoreLedgerArr[i-1]+'</td>'+
-				'<td><a href="javascript:updateData('+i+')"><i class="fa fa-pencil"></i></a> '+
-				'<a href="javascript:deleteData('+i+')"><i class="fa fa-trash-o"></i></a></td></tr>');
+			for(i=0;i<tempDataArr.length;i++){
+				$("#tabbody").append('<tr>'+
+				'<td><input type="text" id="mgupd'+i+'" size="50" /></td>'+
+				'<td><input type="text" id="misgupd'+i+'" size="50" /></td>'+
+				'<td><input type="text" id="ledgeupd'+i+'" value="'+tempDataArr[i]+'" readonly="readonly" size="50" /></td>'+
+				'<td><button type="button" onclick="sendInsertData('+i+', this);">Add to Ignore List</button></td>'+
+				'<td><button type="button" onclick="sendGroupData('+i+', this);">Update Group</button></td></tr>');
 			}
-			
-			$("#paginate").empty();
-			if(Math.ceil(ignoreLedgerArr.length/5)>1){
-				$("#paginate").append('<li><a href="javascript:findPageData(1)">&laquo;</a></li>');
-				for(i=1;i<=Math.ceil(ignoreLedgerArr.length/5);i++){
-					$("#paginate").append('<li><a href="javascript:findPageData('+i+')">'+i+'</a></li>')
-				}
-				$("#paginate").append('<li><a href="javascript:findPageData('+Math.ceil(ignoreLedgerArr.length/5)+')">&raquo;</a></li>');	
-			}
-			
 		}
+		
 		
 		function ignoreUpdDataPush(data){
-			alert('Data Updated successfully!');
-			ignoreDataPush(data)
+			alert('Ignore Ledger Data is Inserted successfully!');
+			removeElement(rowKey)
 		}
 		
-		function findPageData(pageNo){
-			$("#tabbody").empty();
-			for(i=((pageNo-1)*5)+1;i<=(pageNo*5) && i<=ignoreLedgerArr.length;i++){
-				$("#tabbody").append('<tr><td>'+i+'</td>'+
-						'<td>'+ignoreLedgerArr[i-1]+'</td>'+
-						'<td><a href="javascript:updateData('+i+')"><i class="fa fa-pencil"></i></a> '+
-						'<a href="javascript:deleteData('+i+')"><i class="fa fa-trash-o"></i></a></td></tr>');
-			}
-		}
-		function deleteData(ledger){
-			$('#delLedg').text(ignoreLedgerArr[ledger-1]);
-			$('#myModal').modal('show');
-		}
-		function sendDeleteData(){
-			getJson('/vapp/updateignoreledger?ledger='+$('#delLedg').text()+'&mode=D', 'ignoreUpd');
-			//alert('Deleted : '+ $('#delLedg').text())
+		function removeElement(row){
+			var table = document.getElementById("dynoTable");
+			var i = row.parentNode.parentNode.rowIndex;
+			table.deleteRow(i);
 		}
 		
-		function updateData(ledger){
-			$('#ledger').val(ignoreLedgerArr[ledger-1]);
-			$('#updLedger').val(ignoreLedgerArr[ledger-1]);
-			$('#myModal2').modal('show');
+		function sendInsertData(ledgerIndex, rowObj){
+			rowKey=rowObj;
+			getJson('updateignoreledger?ledger='+tempDataArr[ledgerIndex]+'&mode=I', 'ignoreUpd');
 		}
 		
-		function sendInsertData(){
-			getJson('/vapp/updateignoreledger?ledger='+$('#newLedger').val()+'&mode=I', 'ignoreUpd');
-			//alert('Inserted : '+ $('#newLedger').val())
-		}
-		
-		function sendUpdateData(){
-			if($('#ledger').val()!=$('#updledger').val())
-				getJson('/vapp/updateignoreledger?ledger='+$('#ledger').val()+'&newledger='+$('#updLedger').val()+'&mode=U', 'ignoreUpd');
+		function sendGroupData(ledgerIndex, rowObj) {
+			if($('#mgupd'+ledgerIndex).val().length>0 && $('#misgupd'+ledgerIndex).val().length>0){
+				rowKey=rowObj;
+				   var search = {
+				      "mainGroup" : $('#mgupd'+ledgerIndex).val(),
+				      "misGroup" : $('#misgupd'+ledgerIndex).val(),
+				      "ledger" : $('#ledgeupd'+ledgerIndex).val()
+				   }
+				   $.ajax({
+				      type: "POST",
+				      contentType : 'application/json',
+				      dataType : 'jsonp',
+			    		jsonp : 'callback',
+				      url: "insgrpdata",
+				      data: JSON.stringify(search), // Note it is important
+				      success :function(result) {
+				       		if(result)
+				       			removeElement(rowKey);
+				     }
+				  });
+			}else
+				alert('Please Enter Main Group and MIS Group Name')
 		}
 		
 	</script>
@@ -163,13 +158,13 @@
 			<li><ul class="dashboard-menu nav nav-list collapse in">
 					<li><a href="index.html"><span class="fa fa-caret-right"></span>
 							Main</a></li>
-					<li class="active"><a href="ignore.html"><span
+					<li><a href="ignore.html"><span
 							class="fa fa-caret-right"></span> Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
 					<li><a href="data-entry.html"><span
 							class="fa fa-caret-right"></span> Data Entry</a></li>
-					<li><a href="uploader.html"><span
+					<li class="active"><a href="uploader.html"><span
 							class="fa fa-caret-right"></span> Upload Data</a></li>		
 				</ul></li>
 
@@ -213,25 +208,18 @@
 			<h1 class="page-title">Users</h1>
 			<ul class="breadcrumb">
 				<li><a href="index.html">Home</a></li>
-				<li class="active">Users</li>
+				<li class="active">Missing Groups</li>
 			</ul>
 
 		</div>
 		<div class="main-content">
 
-			<div class="btn-toolbar list-toolbar">
-				<button class="btn btn-primary" onclick="$('#myModal1').modal('show');">
-					<i class="fa fa-plus"></i> New Ignore Ledger
-				</button>
-				<button class="btn btn-default">Export</button>
-				<div class="btn-group"></div>
-			</div>
-			<table class="table" style="width: 40%;">
+			<table class="table" id="dynoTable">
 				<thead>
 					<tr>
-						<th style="width: 3.5em;">#</th>
-						<th>Ledgers</th>
-						<th style="width: 3.5em;"></th>
+						<th>Main Group</th>
+						<th>MIS Group</th>
+						<th>Ledger</th>
 					</tr>
 				</thead>
 				<tbody id="tabbody">
@@ -313,7 +301,8 @@
 					</div>
 				</div>
 			</div>
-			
+	</div>
+			</div>		
 	<div class="footer">
 		<hr>
 		<p class="pull-right">A product of VAPP</p>

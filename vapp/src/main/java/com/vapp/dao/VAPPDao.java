@@ -5,11 +5,13 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.vapp.model.GroupData;
 import com.vapp.model.MasterData;
 
 public interface VAPPDao {
 	public boolean checkTempData(String txnDate, Connection conn);
 	public void getGroupMasterData(Connection conn);
+	public int insertGroupMasterData(GroupData groupData);
 	public void getIgnoreLedgerList(Connection conn);
 	public List<String> deleteIgnoreLedger(String ledger);
 	public List<String> insertIgnoreLedger(String ledger);

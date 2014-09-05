@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vapp.dao.VAPPDao;
+import com.vapp.model.GroupData;
 import com.vapp.model.MasterData;
 
 @Service
@@ -186,6 +187,13 @@ public class VAPPServiceImpl implements VAPPService
 	public List<String> getTempData() {
 		
 		return vappDao.getTempData();
+	}
+
+	public boolean insertGroupMasterData(GroupData groupData) {
+		boolean result=false;
+		if(vappDao.insertGroupMasterData(groupData)>=1)
+			result=true;
+		return result;
 	}
     
 }

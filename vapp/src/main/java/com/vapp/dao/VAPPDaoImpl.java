@@ -14,12 +14,14 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.vapp.model.GroupData;
 import com.vapp.model.MasterData;
 
 @Component
 public class VAPPDaoImpl implements VAPPDao {
 	
 	static final String SEL_GRP_SQL="SELECT LEDGER, GRP_MST_ID FROM VAPP_GROUP_MASTER";
+	static final String INS_GRP_SQL="INSERT INTO VAPP_GROUP_MASTER VALUES(GRP_MST_seq.nextval, ?, ?, ?)";
 	static final String SEL_IGNORE_SQL="SELECT LEDGER FROM VAPP_IGNORE_LEDGER";
 	static final String EXISTS_SQL="SELECT 1 FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
 	static final String SEL_TEMP_SQL="SELECT LEDGER FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1";
@@ -256,23 +258,8 @@ public class VAPPDaoImpl implements VAPPDao {
 		}
     	return i;
     }
-	
-	public Connection getConnection(String url, String user, String pwd)
-			throws ClassNotFoundException, SQLException {
-		Connection conn;
-		Class.forName("oracle.jdbc.driver.OracleDriver");
-
-		conn = DriverManager.getConnection(url, user, pwd);
-		return conn;
-	}
     
-    public Connection getVAPPConnection() throws ClassNotFoundException, SQLException{
-    	Connection conn=null;
-    	conn = getConnection("jdbc:oracle:thin:@localhost:1521:XE",
-				"techdash", "techdash");
-    	return conn;
-    }
-	public List<String> getTempData() {
+    public List<String> getTempData() {
 		Connection conn=null;
 		Statement stmt = null;
 		ResultSet rset = null;
@@ -302,4 +289,47 @@ public class VAPPDaoImpl implements VAPPDao {
 		}
 		return tempData;
 	}
+	public int insertGroupMasterData(GroupData groupData) {
+		Connection conn=null;
+    	PreparedStatement stmt=null;
+    	int i=0;
+    	try {
+    		conn = getVAPPConnection();
+			stmt=conn.prepareStatement(INS_GRP_SQL);
+			stmt.setString(1, groupData.getMainGroup());
+			stmt.setString(2, groupData.getMisGroup());
+			stmt.setString(3, groupData.getLedger());
+			i=stmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			try{
+				if(stmt!=null)
+					stmt.close();
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+		}
+    	return i;
+	}
+	
+	public Connection getConnection(String url, String user, String pwd)
+			throws ClassNotFoundException, SQLException {
+		Connection conn;
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+
+		conn = DriverManager.getConnection(url, user, pwd);
+		return conn;
+	}
+    
+    public Connection getVAPPConnection() throws ClassNotFoundException, SQLException{
+    	Connection conn=null;
+    	conn = getConnection("jdbc:oracle:thin:@localhost:1521:XE",
+				"techdash", "techdash");
+    	return conn;
+    }
+	
 }
