@@ -18,5 +18,6 @@ public interface VAPPDao {
 	public int insertTempData(Connection conn, MasterData md, Date txnDate);
 	public List<String> getIgnoreLedger();
 	public Connection getVAPPConnection() throws ClassNotFoundException, SQLException;
+	public List<String> getTempData();
 }
 

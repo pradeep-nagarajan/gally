@@ -51,6 +51,16 @@ public class VAPPController {
 					HttpStatus.OK);
 	  }
 	 
+	 @RequestMapping(value = "/getTempData", method = RequestMethod.GET)
+	  public @ResponseBody
+	  ResponseEntity getTempData(
+	      @RequestParam(value = "callback", required = true) String callback)
+	  {
+		
+		 return new ResponseEntity(constructCallback(callback, vappSrv.getTempData()), new HttpHeaders(),
+					HttpStatus.OK);
+	  }
+	 
 	 public String constructCallback(String callback, Object data){
 		 StringBuffer theStringBuffer = new StringBuffer();
 		 Gson gson = new Gson();

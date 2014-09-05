@@ -22,6 +22,7 @@ public class VAPPDaoImpl implements VAPPDao {
 	static final String SEL_GRP_SQL="SELECT LEDGER, GRP_MST_ID FROM VAPP_GROUP_MASTER";
 	static final String SEL_IGNORE_SQL="SELECT LEDGER FROM VAPP_IGNORE_LEDGER";
 	static final String EXISTS_SQL="SELECT 1 FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
+	static final String SEL_TEMP_SQL="SELECT LEDGER FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1";
 	static final String INSERT_TEMP_SQL="INSERT INTO VAPP_UPLOADED_TEMP VALUES(MST_DATA_seq.nextval, ?, ?, to_date(?,'DD/MM/RRRR'), ?, ?)";
 	static final String DELETE_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
 	static final String UPDATE_IGNORE_SQL="UPDATE VAPP_IGNORE_LEDGER SET LEDGER=? where LEDGER=?";
@@ -271,4 +272,34 @@ public class VAPPDaoImpl implements VAPPDao {
 				"techdash", "techdash");
     	return conn;
     }
+	public List<String> getTempData() {
+		Connection conn=null;
+		Statement stmt = null;
+		ResultSet rset = null;
+		List<String> tempData=new ArrayList<String>();
+		try {
+			conn=getVAPPConnection();
+			stmt = conn.createStatement();
+			rset = stmt.executeQuery(SEL_TEMP_SQL);
+			while(rset.next()){
+				tempData.add(rset.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if(rset!=null)
+					rset.close();
+				if(stmt!=null)
+					stmt.close();
+				if(conn!=null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return tempData;
+	}
 }

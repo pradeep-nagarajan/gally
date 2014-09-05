@@ -2,6 +2,7 @@ package com.vapp.service;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.util.List;
 import java.util.Map;
 
 public interface VAPPService {
@@ -11,4 +12,5 @@ public interface VAPPService {
 	public Map<String, Object> deleteIgnoreLedger(String ledger);
 	public Map<String, Object> insertIgnoreLedger(String ledger);
 	public Map<String, Object> updateIgnoreLedger(String ledger, String newLedger);
+	public List<String> getTempData();
 }

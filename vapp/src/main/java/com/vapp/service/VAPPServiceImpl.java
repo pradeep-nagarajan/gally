@@ -182,5 +182,10 @@ public class VAPPServiceImpl implements VAPPService
 		hm.put("ignoreList", ignore);
 		return hm;
 	}
+
+	public List<String> getTempData() {
+		
+		return vappDao.getTempData();
+	}
     
 }
