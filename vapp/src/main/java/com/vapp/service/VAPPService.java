@@ -16,4 +16,5 @@ public interface VAPPService {
 	public Map<String, Object> updateIgnoreLedger(String ledger, String newLedger);
 	public List<String> getTempData();
 	public boolean insertGroupMasterData(GroupData groupData);
+	public String getMISData(String fromDate, String toDate);
 }

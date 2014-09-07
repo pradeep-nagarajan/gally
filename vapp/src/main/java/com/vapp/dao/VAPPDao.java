@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.vapp.model.GroupData;
 import com.vapp.model.MasterData;
@@ -21,5 +22,6 @@ public interface VAPPDao {
 	public List<String> getIgnoreLedger();
 	public Connection getVAPPConnection() throws ClassNotFoundException, SQLException;
 	public List<String> getTempData();
+	public Map<String, List<Object>> getMISData(String fromDate, String toDate);
 }
 

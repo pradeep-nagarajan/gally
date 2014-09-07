@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,12 +25,21 @@ public class VAPPDaoImpl implements VAPPDao {
 	static final String INS_GRP_SQL="INSERT INTO VAPP_GROUP_MASTER VALUES(GRP_MST_seq.nextval, ?, ?, ?)";
 	static final String SEL_IGNORE_SQL="SELECT LEDGER FROM VAPP_IGNORE_LEDGER";
 	static final String EXISTS_SQL="SELECT 1 FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
-	static final String SEL_TEMP_SQL="SELECT LEDGER FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1";
+	static final String SEL_TEMP_SQL="SELECT DISTINCT LEDGER FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1 ORDER BY LEDGER";
 	static final String INSERT_TEMP_SQL="INSERT INTO VAPP_UPLOADED_TEMP VALUES(MST_DATA_seq.nextval, ?, ?, to_date(?,'DD/MM/RRRR'), ?, ?)";
 	static final String DELETE_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
+	static final String DEL_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1 and LEDGER=?";
+	static final String UPD_TEMP_SQL = "UPDATE VAPP_UPLOADED_TEMP SET GRP_ID=(SELECT GRP_MST_ID FROM "
+			+ "VAPP_GROUP_MASTER WHERE LEDGER=?) WHERE GRP_ID=-1 and LEDGER=?";
 	static final String UPDATE_IGNORE_SQL="UPDATE VAPP_IGNORE_LEDGER SET LEDGER=? where LEDGER=?";
 	static final String INSERT_IGNORE_SQL="INSERT INTO VAPP_IGNORE_LEDGER values(?)";
 	static final String DEL_IGNORE_SQL="DELETE FROM VAPP_IGNORE_LEDGER WHERE LEDGER=?";
+	static final String MIS_TEMP_SQL="SELECT temp.ledger||'~`'||master.MIS_GRP misledge, TO_CHAR (txn_date, 'DD/MM/YYYY'), "
+	+ "SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) "
+	+ "FROM vapp_uploaded_temp temp, vapp_group_master master WHERE TXN_DATE between to_date(?,'DD-MM-YYYY') and to_date(?,'DD-MM-YYYY')"
+	+ "and grp_mst_id=grp_id "
+	+ "group by temp.ledger||'~`'||master.MIS_GRP, txn_date "
+	+ "order by to_char(TXN_DATE,'YYYYMMDD'), misledge";
 	
 	
 	static Map<String, Integer> hm=new HashMap<String, Integer>();
@@ -152,15 +162,16 @@ public class VAPPDaoImpl implements VAPPDao {
 	public List<String> insertIgnoreLedger(String ledger){
 		Connection conn=null;
 		PreparedStatement ps=null;
-		boolean result=false;
     	try {
 			conn = getVAPPConnection();
 			ps=conn.prepareStatement(INSERT_IGNORE_SQL);
 			ps.setString(1, ledger);
 			int i=ps.executeUpdate();
 			if(i>=1){
-				result=true;
 				getIgnoreLedgerList(conn);
+				ps=conn.prepareStatement(DEL_TEMP_SQL);
+				ps.setString(1, ledger);			
+				ps.executeUpdate();
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -180,7 +191,6 @@ public class VAPPDaoImpl implements VAPPDao {
 	public List<String> updateIgnoreLedger(String ledger, String newLedger){
 		Connection conn=null;
 		PreparedStatement ps=null;
-		boolean result=false;
     	try {
 			conn = getVAPPConnection();
 			ps=conn.prepareStatement(UPDATE_IGNORE_SQL);
@@ -188,7 +198,6 @@ public class VAPPDaoImpl implements VAPPDao {
 			ps.setString(2, ledger);
 			int i=ps.executeUpdate();
 			if(i>=1){
-				result=true;
 				getIgnoreLedgerList(conn);
 			}
 		} catch (ClassNotFoundException e) {
@@ -301,6 +310,15 @@ public class VAPPDaoImpl implements VAPPDao {
 			stmt.setString(3, groupData.getLedger());
 			i=stmt.executeUpdate();
 			
+			if(i>=1){
+				conn.commit();
+				stmt=conn.prepareStatement(UPD_TEMP_SQL);
+				stmt.setString(1, groupData.getLedger());
+				stmt.setString(2, groupData.getLedger());
+				
+				getGroupMasterData(conn);
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -314,6 +332,61 @@ public class VAPPDaoImpl implements VAPPDao {
 			}
 		}
     	return i;
+	}
+	
+	public Map<String, List<Object>> getMISData(String fromDate, String toDate) {
+		Connection conn=null;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		Map<String, List<Object>> data = new LinkedHashMap<String, List<Object>>();
+		List<Object> headerRowData = new ArrayList<Object>();
+		data.put("Ledger~`MIS Grouping", headerRowData);
+		int colIndex = -1;
+		String prevDate = "";
+		
+		try {
+			conn=getVAPPConnection();
+			stmt = conn.prepareStatement(MIS_TEMP_SQL);
+			stmt.setString(1, fromDate);
+			stmt.setString(2, toDate);
+			rset = stmt.executeQuery();
+			
+			
+			while (rset.next()) {
+				if (!prevDate.equalsIgnoreCase(rset.getString(2))) {
+					colIndex++;
+					prevDate = rset.getString(2);
+					headerRowData.add(prevDate);
+					data.put("Ledger~`MIS Grouping", headerRowData);
+				}
+				List<Object> rowData;
+				if (data.containsKey(rset.getString(1)))
+					rowData = data.get(rset.getString(1));
+				else
+					rowData = new ArrayList<Object>();
+				for (; rowData.size() < colIndex;)
+					rowData.add("-");
+				rowData.add(rset.getDouble(3));
+				data.put(rset.getString(1), rowData);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if(rset!=null)
+					rset.close();
+				if(stmt!=null)
+					stmt.close();
+				if(conn!=null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return data;
 	}
 	
 	public Connection getConnection(String url, String user, String pwd)
@@ -331,5 +404,6 @@ public class VAPPDaoImpl implements VAPPDao {
 				"techdash", "techdash");
     	return conn;
     }
+	
 	
 }

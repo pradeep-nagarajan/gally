@@ -20,5 +20,4 @@
 		init-method="initiateAll">
 	</bean>
 	
-	
 </beans>

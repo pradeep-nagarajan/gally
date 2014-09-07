@@ -44,10 +44,16 @@
 			}
 		}
 		
-		
 		function ignoreUpdDataPush(data){
-			alert('Ignore Ledger Data is Inserted successfully!');
 			removeElement(rowKey)
+			alert('Ignore Ledger Data is Inserted successfully!');
+		}
+		
+		function insGrpDataPush(result){
+			if(result){
+       			removeElement(rowKey);
+				alert('Group Data has been inserted successfully!');
+			}
 		}
 		
 		function removeElement(row){
@@ -58,7 +64,10 @@
 		
 		function sendInsertData(ledgerIndex, rowObj){
 			rowKey=rowObj;
-			getJson('updateignoreledger?ledger='+tempDataArr[ledgerIndex]+'&mode=I', 'ignoreUpd');
+			var data={"ledger":tempDataArr[ledgerIndex],
+					"mode":"I"};
+			getPOSTJson('updateignoreledger','ignoreUpd', data);
+			//getJson(encodeURI('updateignoreledger?ledger='+tempDataArr[ledgerIndex]+'&mode=I'), 'ignoreUpd');
 		}
 		
 		function sendGroupData(ledgerIndex, rowObj) {
@@ -68,37 +77,28 @@
 				      "mainGroup" : $('#mgupd'+ledgerIndex).val(),
 				      "misGroup" : $('#misgupd'+ledgerIndex).val(),
 				      "ledger" : $('#ledgeupd'+ledgerIndex).val()
-				   }
-				   $.ajax({
-				      type: "POST",
-				      contentType : 'application/json',
-				      dataType : 'jsonp',
-			    		jsonp : 'callback',
-				      url: "insgrpdata",
-				      data: JSON.stringify(search), // Note it is important
-				      success :function(result) {
-				       		if(result)
-				       			removeElement(rowKey);
-				     }
-				  });
+				   };
+				   
+				   getPOSTJson('insgrpdata','insGrp', search);
+				   
 			}else
 				alert('Please Enter Main Group and MIS Group Name')
 		}
 		
+		function ignoreAll(){
+			var data={"ignoreList":tempDataArr};
+			getPOSTJson('ignoreallledger','ignoreAll', data);
+			$("#tabbody").empty();
+		}
+		function ignoreAllDataPush(result){
+			alert('All data saved in Ignore List Successfuly!');
+		}
 	</script>
 	<style type="text/css">
 	.navbar-default .navbar-brand,.navbar-default .navbar-brand:hover {
 		color: #fff;
 	}
 	</style>
-
-	<script type="text/javascript">
-		$(function() {
-			var uls = $('.sidebar-nav > ul > *').clone();
-			uls.addClass('visible-xs');
-			$('#main-menu').append(uls.clone());
-		});
-	</script>
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
@@ -177,10 +177,8 @@
 			<li><ul class="premium-menu nav nav-list collapse">
 					<li class="visible-xs visible-sm"><a href="#">- Reporting
 							features are available here -</a></span>
-					<li><a href="premium-widgets.html"><span
-							class="fa fa-caret-right"></span> Widgets</a></li>
-					<li><a href="premium-invoice.html"><span
-							class="fa fa-caret-right"></span> Invoice</a></li>
+					<li><a href="misrpt.jsp"><span
+							class="fa fa-caret-right"></span> MIS Report</a></li>
 				</ul></li>
 
 			<li><a href="#" data-target=".accounts-menu"
@@ -205,7 +203,7 @@
 	<div class="content" id="content">
 		<div class="header">
 
-			<h1 class="page-title">Users</h1>
+			<h1 class="page-title">Missing Groups</h1>
 			<ul class="breadcrumb">
 				<li><a href="index.html">Home</a></li>
 				<li class="active">Missing Groups</li>
@@ -220,6 +218,8 @@
 						<th>Main Group</th>
 						<th>MIS Group</th>
 						<th>Ledger</th>
+						<th><button type="button" onclick="ignoreAll();">Ignore All</button></th>
+						<th><button type="button" onclick="sendInsertData();">Update All</button></th>
 					</tr>
 				</thead>
 				<tbody id="tabbody">
@@ -227,80 +227,7 @@
 				</tbody>
 			</table>
 
-			<ul class="pagination" id="paginate">
-				
-			</ul>
-
-			<div class="modal small fade" id="myModal" tabindex="-1"
-				role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal"
-								aria-hidden="true">×</button>
-							<h3 id="myModalLabel">Delete Confirmation</h3>
-						</div>
-						<div class="modal-body">
-							<p class="error-text">
-								<i class="fa fa-warning modal-icon"></i>Are you sure you want to
-								delete the ledger - <font id="delLedg"></font>?<br>This cannot be undone.
-							</p>
-						</div>
-						<div class="modal-footer">
-							<button class="btn btn-default" data-dismiss="modal"
-								aria-hidden="true">Cancel</button>
-							<button class="btn btn-danger" onclick="sendDeleteData()" data-dismiss="modal">Delete</button>
-						</div>
-					</div>
-				</div>
-			</div>
 			
-			<div class="modal small fade" id="myModal1" tabindex="-1"
-				role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal"
-								aria-hidden="true">×</button>
-							<h3 id="myModalLabel1">New Ignore Legder</h3>
-						</div>
-						<div class="modal-body">
-							<p class="highlight">
-								Ledger : <input type="text" size="50" id="newLedger" />
-							</p>
-						</div>
-						<div class="modal-footer">
-							<button class="btn btn-default" data-dismiss="modal"
-								aria-hidden="true">Cancel</button>
-							<button class="btn btn-danger" onclick="sendInsertData()" data-dismiss="modal">Add</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			
-			<div class="modal small fade" id="myModal2" tabindex="-1"
-				role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal"
-								aria-hidden="true">×</button>
-							<h3 id="myModalLabel2">Update Ignore Legder</h3>
-						</div>
-						<div class="modal-body">
-							<p class="highlight">
-								Previous: <input type="text" readonly="readonly" id="ledger" /><br><br>
-								Ledger : <input type="text" id="updLedger" />
-							</p>
-						</div>
-						<div class="modal-footer">
-							<button class="btn btn-default" data-dismiss="modal"
-								aria-hidden="true">Cancel</button>
-							<button class="btn btn-danger" onclick="sendUpdateData()" data-dismiss="modal">Update</button>
-						</div>
-					</div>
-				</div>
-			</div>
 	</div>
 			</div>		
 	<div class="footer">

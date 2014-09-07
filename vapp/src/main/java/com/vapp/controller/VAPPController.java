@@ -1,5 +1,12 @@
 package com.vapp.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.vapp.model.GroupData;
+import com.vapp.model.IgnoreData;
+import com.vapp.model.IgnoreList;
 import com.vapp.service.VAPPService;
 
 @Controller
@@ -31,25 +40,38 @@ public class VAPPController {
 					HttpStatus.OK);
 	  }
 	 
-	 @RequestMapping(value = "/updateignoreledger", method = RequestMethod.GET)
+	 @RequestMapping(value = "/updateignoreledger", method = RequestMethod.POST)
 	  public @ResponseBody
-	  ResponseEntity deleteIgnoreLedgers(
+	  ResponseEntity updateIgnoreLedgers(
 	      @RequestParam(value = "callback", required = true) String callback,
-	      @RequestParam(value = "ledger", required = true) String ledger,
-	      @RequestParam(value = "newledger", required = false) String newLedger,
-	      @RequestParam(value = "mode", required = true) String mode)
+	      @RequestBody IgnoreData ignoreData)
 	  {
-		if("D".equalsIgnoreCase(mode))
-			return new ResponseEntity(constructCallback(callback, vappSrv.deleteIgnoreLedger(ledger)), new HttpHeaders(),
+		if("D".equalsIgnoreCase(ignoreData.getMode()))
+			return new ResponseEntity(constructCallback(callback, vappSrv.deleteIgnoreLedger(ignoreData.getLedger())), new HttpHeaders(),
 					HttpStatus.OK);
-		else if("I".equalsIgnoreCase(mode))
-			return new ResponseEntity(constructCallback(callback, vappSrv.insertIgnoreLedger(ledger)), new HttpHeaders(),
+		else if("I".equalsIgnoreCase(ignoreData.getMode()))
+			return new ResponseEntity(constructCallback(callback, vappSrv.insertIgnoreLedger(ignoreData.getLedger())), new HttpHeaders(),
 					HttpStatus.OK);
-		else if("U".equalsIgnoreCase(mode))
-			return new ResponseEntity(constructCallback(callback, vappSrv.updateIgnoreLedger(ledger, newLedger)), new HttpHeaders(),
+		else if("U".equalsIgnoreCase(ignoreData.getMode()))
+			return new ResponseEntity(constructCallback(callback, vappSrv.updateIgnoreLedger(ignoreData.getLedger(), ignoreData.getNewLedger())), new HttpHeaders(),
 					HttpStatus.OK);
 		else
 			return new ResponseEntity(constructCallback(callback, "Error"), new HttpHeaders(),
+					HttpStatus.OK);
+	  }
+	 
+	 @RequestMapping(value = "/ignoreallledger", method = RequestMethod.POST)
+	  public @ResponseBody
+	  ResponseEntity updateIgnoreLedgers(
+	      @RequestParam(value = "callback", required = true) String callback,
+	      @RequestBody IgnoreList ignoreList)
+	  {
+		 
+		 for (String ignore : ignoreList.getIgnoreList()) {
+			 vappSrv.insertIgnoreLedger(ignore);
+		}
+		 
+		 return new ResponseEntity(constructCallback(callback, vappSrv.getIgnoreLedger()), new HttpHeaders(),
 					HttpStatus.OK);
 	  }
 	 
@@ -66,11 +88,45 @@ public class VAPPController {
 	 @RequestMapping(value = "/insgrpdata", method = RequestMethod.POST)
 	  public @ResponseBody
 	  ResponseEntity insertGroupData(
-	      @RequestParam(value = "callback", required = false) String callback,@RequestBody GroupData groupData)
+	      @RequestParam(value = "callback", required = true) String callback,@RequestBody GroupData groupData)
 	  {
 		
 		 return new ResponseEntity(constructCallback(callback, vappSrv.insertGroupMasterData(groupData)), new HttpHeaders(),
 					HttpStatus.OK);
+	  }
+	 
+	 @RequestMapping(value = "/genmisrpt", method = RequestMethod.GET)
+	  public void getMISReport(
+	      @RequestParam(value = "fromDate", required = true) String fromDate,
+	      @RequestParam(value = "toDate", required = true) String toDate, HttpServletResponse response)
+	  {
+		 String filePath=vappSrv.getMISData(fromDate, toDate);
+		 System.out.println(filePath);
+		 response.setHeader("Content-Type", "application/xlsx");
+		 response.setHeader("Content-Disposition", "attachment; filename="+filePath.substring(filePath.lastIndexOf("/")+1));
+		 FileInputStream fis=null;
+		 try {
+			OutputStream out=response.getOutputStream();
+			fis=new FileInputStream(new File(filePath));
+			int n=0;
+			byte[] buffer=new byte[1024];
+			while((n=fis.read(buffer))!=-1)
+				out.write(buffer,0,n);
+			
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				fis.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		 
+		 /*return new ResponseEntity(constructCallback(callback, vappSrv.getMISData(fromDate, toDate)), new HttpHeaders(),
+					HttpStatus.OK);*/
+		 //return new ModelAndView("ExcelSummary","reportData",vappSrv.getMISData(fromDate, toDate));
 	  }
 	 
 	 public String constructCallback(String callback, Object data){

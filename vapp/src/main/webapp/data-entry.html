@@ -23,22 +23,6 @@
 	<!-- Demo page code -->
 
 	<script type="text/javascript">
-		$(function() {
-			var match = document.cookie.match(new RegExp('color=([^;]+)'));
-			if (match)
-				var color = match[1];
-			if (color) {
-				$('body').removeClass(function(index, css) {
-					return (css.match(/\btheme-\S+/g) || []).join(' ')
-				})
-				$('body').addClass('theme-' + color);
-			}
-
-			$('[data-popover="true"]').popover({
-				html : true
-			});
-
-		});
 		$( window ).resize(function() {
 			$("#content").css('min-height',($( window ).height()-111));
 			$("#content").css('min-width',($( window ).width()-150));
@@ -52,11 +36,6 @@
 	</style>
 
 	<script type="text/javascript">
-		$(function() {
-			var uls = $('.sidebar-nav > ul > *').clone();
-			uls.addClass('visible-xs');
-			$('#main-menu').append(uls.clone());
-		});
 		function addElement(){
 			$("#addBut").remove();
 			var table = document.getElementById("dynoTable");
@@ -174,10 +153,8 @@
 			<li><ul class="premium-menu nav nav-list collapse">
 					<li class="visible-xs visible-sm"><a href="#">- Reporting
 							features are available here -</a></span>
-					<li><a href="premium-widgets.html"><span
-							class="fa fa-caret-right"></span> Widgets</a></li>
-					<li><a href="premium-invoice.html"><span
-							class="fa fa-caret-right"></span> Invoice</a></li>
+					<li><a href="misrpt.jsp"><span
+							class="fa fa-caret-right"></span> MIS Report</a></li>
 				</ul></li>
 
 			<li><a href="#" data-target=".accounts-menu"
