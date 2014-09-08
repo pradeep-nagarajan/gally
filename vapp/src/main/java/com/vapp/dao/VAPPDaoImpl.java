@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.stereotype.Component;
 
@@ -22,13 +24,15 @@ import com.vapp.model.MasterData;
 public class VAPPDaoImpl implements VAPPDao {
 	
 	static final String SEL_GRP_SQL="SELECT LEDGER, GRP_MST_ID FROM VAPP_GROUP_MASTER";
+	static final String SEL_GRP_DET_SQL="SELECT MAIN_GRP, MIS_GRP, MAIN_GRP||'~`'|| MIS_GRP ||'~`'|| LEDGER FROM VAPP_GROUP_MASTER ORDER BY 3";
 	static final String INS_GRP_SQL="INSERT INTO VAPP_GROUP_MASTER VALUES(GRP_MST_seq.nextval, ?, ?, ?)";
+	static final String DEL_GRP_SQL="DELETE FROM VAPP_GROUP_MASTER WHERE LEDGER=?";
 	static final String SEL_IGNORE_SQL="SELECT LEDGER FROM VAPP_IGNORE_LEDGER";
 	static final String EXISTS_SQL="SELECT 1 FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
 	static final String SEL_TEMP_SQL="SELECT DISTINCT LEDGER FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1 ORDER BY LEDGER";
 	static final String INSERT_TEMP_SQL="INSERT INTO VAPP_UPLOADED_TEMP VALUES(MST_DATA_seq.nextval, ?, ?, to_date(?,'DD/MM/RRRR'), ?, ?)";
 	static final String DELETE_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
-	static final String DEL_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1 and LEDGER=?";
+	static final String DEL_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE LEDGER=?";
 	static final String UPD_TEMP_SQL = "UPDATE VAPP_UPLOADED_TEMP SET GRP_ID=(SELECT GRP_MST_ID FROM "
 			+ "VAPP_GROUP_MASTER WHERE LEDGER=?) WHERE GRP_ID=-1 and LEDGER=?";
 	static final String UPDATE_IGNORE_SQL="UPDATE VAPP_IGNORE_LEDGER SET LEDGER=? where LEDGER=?";
@@ -134,14 +138,12 @@ public class VAPPDaoImpl implements VAPPDao {
 	public List<String> deleteIgnoreLedger(String ledger){
 		Connection conn=null;
 		PreparedStatement ps=null;
-		boolean result=false;
     	try {
 			conn = getVAPPConnection();
 			ps=conn.prepareStatement(DEL_IGNORE_SQL);
 			ps.setString(1, ledger);
 			int i=ps.executeUpdate();
 			if(i>=1){
-				result=true;
 				getIgnoreLedgerList(conn);
 			}
 		} catch (ClassNotFoundException e) {
@@ -298,6 +300,46 @@ public class VAPPDaoImpl implements VAPPDao {
 		}
 		return tempData;
 	}
+    
+    public Map<String, Set<String>> getGroupLIst() {
+		Connection conn=null;
+		Statement stmt = null;
+		ResultSet rset = null;
+		Set<String> mainGrp=new TreeSet<String>();
+		Set<String> misGrp=new TreeSet<String>();
+		Set<String> allData=new TreeSet<String>();
+		Map<String, Set<String>> tsm=new HashMap<String, Set<String>>();
+		try {
+			conn=getVAPPConnection();
+			stmt = conn.createStatement();
+			rset = stmt.executeQuery(SEL_GRP_DET_SQL);
+			while(rset.next()){
+				mainGrp.add(rset.getString(1));
+				misGrp.add(rset.getString(2));
+				allData.add(rset.getString(3));
+			}
+			tsm.put("mainGrp", mainGrp);
+			tsm.put("misGrp", misGrp);
+			tsm.put("allData", allData);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			try {
+				if(rset!=null)
+					rset.close();
+				if(stmt!=null)
+					stmt.close();
+				if(conn!=null)
+					conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return tsm;
+	}
+    
 	public int insertGroupMasterData(GroupData groupData) {
 		Connection conn=null;
     	PreparedStatement stmt=null;
@@ -309,16 +351,47 @@ public class VAPPDaoImpl implements VAPPDao {
 			stmt.setString(2, groupData.getMisGroup());
 			stmt.setString(3, groupData.getLedger());
 			i=stmt.executeUpdate();
-			
 			if(i>=1){
-				conn.commit();
+				getGroupMasterData(conn);
+				if(stmt!=null)
+					stmt.close();
 				stmt=conn.prepareStatement(UPD_TEMP_SQL);
 				stmt.setString(1, groupData.getLedger());
 				stmt.setString(2, groupData.getLedger());
-				
-				getGroupMasterData(conn);
+				stmt.executeUpdate();
 			}
 			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			try{
+				if(stmt!=null)
+					stmt.close();
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+		}
+    	return i;
+	}
+	
+	public int deleteGroupMasterData(GroupData groupData) {
+		Connection conn=null;
+    	PreparedStatement stmt=null;
+    	int i=0;
+    	try {
+    		conn = getVAPPConnection();
+    		stmt=conn.prepareStatement(DEL_TEMP_SQL);
+			stmt.setString(1, groupData.getLedger());
+			stmt.executeUpdate();
+			
+			if(stmt!=null)
+				stmt.close();
+			stmt=conn.prepareStatement(DEL_GRP_SQL);
+			stmt.setString(1, groupData.getLedger());
+			i=stmt.executeUpdate();
+			getGroupMasterData(conn);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {

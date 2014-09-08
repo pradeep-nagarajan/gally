@@ -100,8 +100,8 @@
 							Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
-					<li><a href="data-entry.html"><span
-							class="fa fa-caret-right"></span> Data Entry</a></li>
+					<li><a href="ledgers.html"><span
+							class="fa fa-caret-right"></span> Ledgers List</a></li>
 					<li><a href="uploader.html"><span
 							class="fa fa-caret-right"></span> Upload Data</a></li>			
 				</ul></li>

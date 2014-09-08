@@ -4,6 +4,7 @@ public class GroupData {
 	private String mainGroup;
 	private String misGroup;
 	private String ledger;
+	private String mode;
 	public String getMainGroup() {
 		return mainGroup;
 	}
@@ -22,10 +23,16 @@ public class GroupData {
 	public void setLedger(String ledger) {
 		this.ledger = ledger;
 	}
+	public String getMode() {
+		return mode;
+	}
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
 	@Override
 	public String toString() {
 		return "GroupData [mainGroup=" + mainGroup + ", misGroup=" + misGroup
-				+ ", ledger=" + ledger + "]";
+				+ ", ledger=" + ledger + ", mode=" + mode + "]";
 	}
 	
 }

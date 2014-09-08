@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.ss.usermodel.Cell;
@@ -197,11 +198,13 @@ public class VAPPServiceImpl implements VAPPService
 		return vappDao.getTempData();
 	}
 
-	public boolean insertGroupMasterData(GroupData groupData) {
-		boolean result=false;
-		if(vappDao.insertGroupMasterData(groupData)>=1)
-			result=true;
-		return result;
+	public Map<String, Set<String>> insertGroupMasterData(GroupData groupData) {
+		int i=vappDao.insertGroupMasterData(groupData);
+		Map<String, Set<String>> tsm=vappDao.getGroupLIst();
+		Set<String> st=new TreeSet<String>();
+		st.add(i>=1?"true":"false");
+		tsm.put("result", st);
+		return tsm;
 	}
 
 	public String getMISData(String fromDate, String toDate) {
@@ -289,6 +292,20 @@ public class VAPPServiceImpl implements VAPPService
 			System.out.println("data.xlsx written successfully on disk.");
 		
 		return fileName;
+	}
+
+	public Map<String, Set<String>> getGroupLIst() {
+		
+		return vappDao.getGroupLIst();
+	}
+
+	public Map<String, Set<String>> deleteGroupMasterData(GroupData groupData) {
+		int i=vappDao.deleteGroupMasterData(groupData);
+		Map<String, Set<String>> tsm=vappDao.getGroupLIst();
+		Set<String> st=new TreeSet<String>();
+		st.add(i>=1?"true":"false");
+		tsm.put("result", st);
+		return tsm;
 	}
     
 }

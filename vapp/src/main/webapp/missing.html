@@ -11,8 +11,9 @@
 <link rel="stylesheet" type="text/css"
 	href="lib/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
-
+<link rel="stylesheet" href="stylesheets/jquery-ui.css">
 <script src="lib/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="lib/jquery-ui.js"></script>
 <script src="lib/ajaxcall.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="stylesheets/theme.css">
 
@@ -27,9 +28,13 @@
 			$( window ).resize(function() {
 				$("#content").css('min-height',($( window ).height()-111));
 				});
-			getJson('/vapp/gettempdata', 'temp');
+			getJson('/vapp/getgrplist', 'grpDetails');
+			
+			
 		});
 		var tempDataArr=[];
+		var mainGrp=[];
+		var misGrp=[];
 		var rowKey;
 		function tempDataPush(data){
 			tempDataArr=data;
@@ -41,7 +46,19 @@
 				'<td><input type="text" id="ledgeupd'+i+'" value="'+tempDataArr[i]+'" readonly="readonly" size="50" /></td>'+
 				'<td><button type="button" onclick="sendInsertData('+i+', this);">Add to Ignore List</button></td>'+
 				'<td><button type="button" onclick="sendGroupData('+i+', this);">Update Group</button></td></tr>');
+				$( "#mgupd"+i ).autocomplete({
+				      source: mainGrp
+				    });
+				$( "#misgupd"+i ).autocomplete({
+				      source: misGrp
+				    });
 			}
+		}
+		
+		function grpDetailsDataPush(data){
+       			mainGrp=data.mainGrp;
+       			misGrp=data.misGrp;
+       			getJson('/vapp/gettempdata', 'temp');
 		}
 		
 		function ignoreUpdDataPush(data){
@@ -49,9 +66,11 @@
 			alert('Ignore Ledger Data is Inserted successfully!');
 		}
 		
-		function insGrpDataPush(result){
-			if(result){
+		function insGrpDataPush(data){
+			if(data.result){
        			removeElement(rowKey);
+       			mainGrp=data.mainGrp;
+       			misGrp=data.misGrp;
 				alert('Group Data has been inserted successfully!');
 			}
 		}
@@ -76,10 +95,11 @@
 				   var search = {
 				      "mainGroup" : $('#mgupd'+ledgerIndex).val(),
 				      "misGroup" : $('#misgupd'+ledgerIndex).val(),
-				      "ledger" : $('#ledgeupd'+ledgerIndex).val()
+				      "ledger" : $('#ledgeupd'+ledgerIndex).val(),
+				      "mode" : "I"
 				   };
 				   
-				   getPOSTJson('insgrpdata','insGrp', search);
+				   getPOSTJson('updgrpdata','insGrp', search);
 				   
 			}else
 				alert('Please Enter Main Group and MIS Group Name')
@@ -162,8 +182,8 @@
 							class="fa fa-caret-right"></span> Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
-					<li><a href="data-entry.html"><span
-							class="fa fa-caret-right"></span> Data Entry</a></li>
+					<li><a href="ledgers.html"><span
+							class="fa fa-caret-right"></span> Ledgers List</a></li>
 					<li class="active"><a href="uploader.html"><span
 							class="fa fa-caret-right"></span> Upload Data</a></li>		
 				</ul></li>
@@ -219,7 +239,6 @@
 						<th>MIS Group</th>
 						<th>Ledger</th>
 						<th><button type="button" onclick="ignoreAll();">Ignore All</button></th>
-						<th><button type="button" onclick="sendInsertData();">Update All</button></th>
 					</tr>
 				</thead>
 				<tbody id="tabbody">

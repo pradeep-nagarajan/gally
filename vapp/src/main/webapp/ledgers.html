@@ -27,67 +27,84 @@
 			$( window ).resize(function() {
 				$("#content").css('min-height',($( window ).height()-111));
 				});
-			getJson('/vapp/ignoreledger', 'ignore');
+			getJson('/vapp/getgrplist', 'grpDetails');
 		});
-		var ignoreLedgerArr=[];
-		function ignoreDataPush(data){
-			ignoreLedgerArr=data.ignoreList;
+		var allData=[];
+		function grpDetailsDataPush(data){
+			allData=data.allData;
 			var recCount=5;
-			if(ignoreLedgerArr.length<5)
-				recCount=ignoreLedgerArr.length;
+			if(allData.length<5)
+				recCount=allData.length;
 			$("#tabbody").empty();
 			for(i=1;i<=recCount;i++){
+				var temp=allData[i-1].split("~`");
 				$("#tabbody").append('<tr><td>'+i+'</td>'+
-				'<td>'+ignoreLedgerArr[i-1]+'</td>'+
+				'<td>'+temp[0]+'</td>'+
+				'<td>'+temp[1]+'</td>'+
+				'<td>'+temp[2]+'</td>'+
 				'<td><a href="javascript:updateData('+i+')"><i class="fa fa-pencil"></i></a> '+
 				'<a href="javascript:deleteData('+i+')"><i class="fa fa-trash-o"></i></a></td></tr>');
 			}
 			
 			$("#paginate").empty();
-			if(Math.ceil(ignoreLedgerArr.length/5)>1){
+			if(Math.ceil(allData.length/5)>1){
 				$("#paginate").append('<li><a href="javascript:findPageData(1)">&laquo;</a></li>');
-				for(i=1;i<=Math.ceil(ignoreLedgerArr.length/5);i++){
+				for(i=1;i<=Math.ceil(allData.length/5);i++){
 					$("#paginate").append('<li><a href="javascript:findPageData('+i+')">'+i+'</a></li>')
 				}
-				$("#paginate").append('<li><a href="javascript:findPageData('+Math.ceil(ignoreLedgerArr.length/5)+')">&raquo;</a></li>');	
+				$("#paginate").append('<li><a href="javascript:findPageData('+Math.ceil(allData.length/5)+')">&raquo;</a></li>');	
 			}
 			
 		}
 		
-		function ignoreUpdDataPush(data){
-			alert('Data Updated successfully!');
-			ignoreDataPush(data)
+		function grpUpdDataPush(data){
+			if(data.result[0]=="true"){
+				alert('Data Updated successfully!');
+				grpDetailsDataPush(data)
+			}else
+				alert('Data NOT Updated successfully!');
 		}
 		
 		function findPageData(pageNo){
 			$("#tabbody").empty();
-			for(i=((pageNo-1)*5)+1;i<=(pageNo*5) && i<=ignoreLedgerArr.length;i++){
+			for(i=((pageNo-1)*5)+1;i<=(pageNo*5) && i<=allData.length;i++){
+				var temp=allData[i-1].split("~`");
 				$("#tabbody").append('<tr><td>'+i+'</td>'+
-						'<td>'+ignoreLedgerArr[i-1]+'</td>'+
+						'<td>'+temp[0]+'</td>'+
+						'<td>'+temp[1]+'</td>'+
+						'<td>'+temp[2]+'</td>'+
 						'<td><a href="javascript:updateData('+i+')"><i class="fa fa-pencil"></i></a> '+
 						'<a href="javascript:deleteData('+i+')"><i class="fa fa-trash-o"></i></a></td></tr>');
 			}
 		}
 		function deleteData(ledger){
-			$('#delLedg').text(ignoreLedgerArr[ledger-1]);
+			var temp=allData[ledger-1].split("~`");
+			$('#delLedg').text(temp[2]);
 			$('#myModal').modal('show');
 		}
 		function sendDeleteData(){
-			var data={"ledger":$('#delLedg').text(),
-					"mode":"D"};
-			getPOSTJson('updateignoreledger','ignoreUpd', data);
+			var search = {
+				      "ledger" : $('#delLedg').text(),
+				      "mode" : "D"
+			};
+				   
+			getPOSTJson('updgrpdata','grpUpd', search);
 		}
 		
 		function updateData(ledger){
-			$('#ledger').val(ignoreLedgerArr[ledger-1]);
-			$('#updLedger').val(ignoreLedgerArr[ledger-1]);
+			$('#ledger').val(allData[ledger-1]);
+			$('#updLedger').val(allData[ledger-1]);
 			$('#myModal2').modal('show');
 		}
 		
 		function sendInsertData(){
-			var data={"ledger":$('#newLedger').val(),
-					"mode":"I"};
-			getPOSTJson('updateignoreledger','ignoreUpd', data);
+			var data = {
+				      "mainGroup" : $('#newMain').val(),
+				      "misGroup" : $('#newMIS').val(),
+				      "ledger" : $('#newLedger').val(),
+				      "mode" : "I"
+			};
+			getPOSTJson('updgrpdata','grpUpd', data);
 		}
 		
 		function sendUpdateData(){
@@ -164,11 +181,11 @@
 			<li><ul class="dashboard-menu nav nav-list collapse in">
 					<li><a href="index.html"><span class="fa fa-caret-right"></span>
 							Main</a></li>
-					<li class="active"><a href="ignore.html"><span
+					<li><a href="ignore.html"><span
 							class="fa fa-caret-right"></span> Ignore Ledger List</a></li>
 					<li><a href="user.html"><span class="fa fa-caret-right"></span>
 							User Profile</a></li>
-					<li><a href="ledgers.html"><span
+					<li class="active"><a href="ledgers.html"><span
 							class="fa fa-caret-right"></span> Ledgers List</a></li>
 					<li><a href="uploader.html"><span
 							class="fa fa-caret-right"></span> Upload Data</a></li>		
@@ -209,10 +226,10 @@
 	<div class="content" id="content">
 		<div class="header">
 
-			<h1 class="page-title">Ignored Ledgers List</h1>
+			<h1 class="page-title">Ledgers List</h1>
 			<ul class="breadcrumb">
 				<li><a href="index.html">Home</a></li>
-				<li class="active">Ignored Ledgers</li>
+				<li class="active">Ledgers List</li>
 			</ul>
 
 		</div>
@@ -220,17 +237,18 @@
 
 			<div class="btn-toolbar list-toolbar">
 				<button class="btn btn-primary" onclick="$('#myModal1').modal('show');">
-					<i class="fa fa-plus"></i> New Ignore Ledger
+					<i class="fa fa-plus"></i> New Ledger
 				</button>
 				<button class="btn btn-default">Export</button>
 				<div class="btn-group"></div>
 			</div>
-			<table class="table" style="width: 40%;">
+			<table class="table">
 				<thead>
 					<tr>
 						<th style="width: 3.5em;">#</th>
+						<th>Main Group</th>
+						<th>MIS Group</th>
 						<th>Ledgers</th>
-						<th style="width: 3.5em;"></th>
 					</tr>
 				</thead>
 				<tbody id="tabbody">
@@ -273,11 +291,17 @@
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal"
 								aria-hidden="true">×</button>
-							<h3 id="myModalLabel1">New Ignore Legder</h3>
+							<h3 id="myModalLabel1">New Legder Entry</h3>
 						</div>
 						<div class="modal-body">
 							<p class="highlight">
-								Ledger : <input type="text" size="50" id="newLedger" />
+								<table>
+								<tr><td>Main Group 	: </td><td><input type="text" size="50" id="newMain" /></td></tr>
+								<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+								<tr><td>MIS Group 	: </td><td><input type="text" size="50" id="newMIS" /></td></tr>
+								<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+								<tr><td>Ledger Name	: </td><td><input type="text" size="50" id="newLedger" /></td></tr>
+								</table>
 							</p>
 						</div>
 						<div class="modal-footer">

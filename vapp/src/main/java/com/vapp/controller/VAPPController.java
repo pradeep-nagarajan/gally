@@ -85,14 +85,21 @@ public class VAPPController {
 					HttpStatus.OK);
 	  }
 	 
-	 @RequestMapping(value = "/insgrpdata", method = RequestMethod.POST)
+	 @RequestMapping(value = "/updgrpdata", method = RequestMethod.POST)
 	  public @ResponseBody
 	  ResponseEntity insertGroupData(
 	      @RequestParam(value = "callback", required = true) String callback,@RequestBody GroupData groupData)
 	  {
-		
-		 return new ResponseEntity(constructCallback(callback, vappSrv.insertGroupMasterData(groupData)), new HttpHeaders(),
+		 if("D".equalsIgnoreCase(groupData.getMode()))
+			 return new ResponseEntity(constructCallback(callback, vappSrv.deleteGroupMasterData(groupData)), new HttpHeaders(),
+						HttpStatus.OK);
+		 else if("I".equalsIgnoreCase(groupData.getMode()))
+			 return new ResponseEntity(constructCallback(callback, vappSrv.insertGroupMasterData(groupData)), new HttpHeaders(),
 					HttpStatus.OK);
+		 else
+			return new ResponseEntity(constructCallback(callback, "Error"), new HttpHeaders(),
+						HttpStatus.OK);
+		 
 	  }
 	 
 	 @RequestMapping(value = "/genmisrpt", method = RequestMethod.GET)
@@ -124,9 +131,16 @@ public class VAPPController {
 			}
 		}
 		 
-		 /*return new ResponseEntity(constructCallback(callback, vappSrv.getMISData(fromDate, toDate)), new HttpHeaders(),
-					HttpStatus.OK);*/
-		 //return new ModelAndView("ExcelSummary","reportData",vappSrv.getMISData(fromDate, toDate));
+	  }
+	 
+	 @RequestMapping(value = "/getgrplist", method = RequestMethod.GET)
+	  public @ResponseBody
+	  ResponseEntity getGroupList(
+	      @RequestParam(value = "callback", required = true) String callback)
+	  {
+		
+		 return new ResponseEntity(constructCallback(callback, vappSrv.getGroupLIst()), new HttpHeaders(),
+					HttpStatus.OK);
 	  }
 	 
 	 public String constructCallback(String callback, Object data){
