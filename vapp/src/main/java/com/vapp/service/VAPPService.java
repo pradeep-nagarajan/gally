@@ -20,4 +20,5 @@ public interface VAPPService {
 	public String getMISData(String fromDate, String toDate);
 	public Map<String, Set<String>> getGroupLIst();
 	public Map<String, Set<String>> deleteGroupMasterData(GroupData groupData);
+	public Map<String, Set<String>> updateGroupMasterData(GroupData groupData);
 }

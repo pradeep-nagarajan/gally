@@ -218,7 +218,7 @@ public class VAPPServiceImpl implements VAPPService
 			data=vappDao.getMISData(fromDate, toDate);
 		
 			int colIndex = data.get("Ledger~`MIS Grouping").size()-1;
-		
+			
 			// Blank workbook
 			XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -282,6 +282,20 @@ public class VAPPServiceImpl implements VAPPService
 					
 				}
 			}
+			Row row = sheet.createRow(rownum++);
+			int currColIndex=((data.get("Ledger~`MIS Grouping").size())*2)+1;
+			//Calculate Grant Total
+			for (int i = 0; i <= currColIndex; i++) {
+				Cell cell = row.createCell(i);
+				if(i==1){
+					cell.setCellValue("Grant Total ");
+					cell.setCellStyle(centerCs);
+				}else if (i > 1){
+					cell.setCellFormula("SUM("+ excelCol[i-2]+"2" + ":"
+							+ excelCol[i-2] + (rownum-1) + ")");
+					cell.setCellStyle(numberCs);
+				}
+			}
 
 			
 				workbook.write(out);
@@ -301,6 +315,15 @@ public class VAPPServiceImpl implements VAPPService
 
 	public Map<String, Set<String>> deleteGroupMasterData(GroupData groupData) {
 		int i=vappDao.deleteGroupMasterData(groupData);
+		Map<String, Set<String>> tsm=vappDao.getGroupLIst();
+		Set<String> st=new TreeSet<String>();
+		st.add(i>=1?"true":"false");
+		tsm.put("result", st);
+		return tsm;
+	}
+
+	public Map<String, Set<String>> updateGroupMasterData(GroupData groupData) {
+		int i=vappDao.updateGroupMasterData(groupData);
 		Map<String, Set<String>> tsm=vappDao.getGroupLIst();
 		Set<String> st=new TreeSet<String>();
 		st.add(i>=1?"true":"false");

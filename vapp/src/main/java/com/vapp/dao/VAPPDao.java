@@ -27,5 +27,6 @@ public interface VAPPDao {
 	public int insertGroupMasterData(GroupData groupData);
 	public Map<String, Set<String>> getGroupLIst();
 	public int deleteGroupMasterData(GroupData groupData);
+	public int updateGroupMasterData(GroupData groupData);
 }
 

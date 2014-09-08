@@ -27,12 +27,14 @@ public class VAPPDaoImpl implements VAPPDao {
 	static final String SEL_GRP_DET_SQL="SELECT MAIN_GRP, MIS_GRP, MAIN_GRP||'~`'|| MIS_GRP ||'~`'|| LEDGER FROM VAPP_GROUP_MASTER ORDER BY 3";
 	static final String INS_GRP_SQL="INSERT INTO VAPP_GROUP_MASTER VALUES(GRP_MST_seq.nextval, ?, ?, ?)";
 	static final String DEL_GRP_SQL="DELETE FROM VAPP_GROUP_MASTER WHERE LEDGER=?";
+	static final String UPD_GRP_SQL="UPDATE VAPP_GROUP_MASTER SET MAIN_GRP=?,MIS_GRP=? WHERE LEDGER=?";
 	static final String SEL_IGNORE_SQL="SELECT LEDGER FROM VAPP_IGNORE_LEDGER";
 	static final String EXISTS_SQL="SELECT 1 FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
 	static final String SEL_TEMP_SQL="SELECT DISTINCT LEDGER FROM VAPP_UPLOADED_TEMP WHERE GRP_ID=-1 ORDER BY LEDGER";
 	static final String INSERT_TEMP_SQL="INSERT INTO VAPP_UPLOADED_TEMP VALUES(MST_DATA_seq.nextval, ?, ?, to_date(?,'DD/MM/RRRR'), ?, ?)";
 	static final String DELETE_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE to_char(TXN_DATE,'MM-YYYY')=?";
 	static final String DEL_TEMP_SQL="DELETE FROM VAPP_UPLOADED_TEMP WHERE LEDGER=?";
+	static final String UPD_GRP_TEMP_SQL="UPDATE VAPP_UPLOADED_TEMP set GRP_ID=-1 WHERE LEDGER=?";
 	static final String UPD_TEMP_SQL = "UPDATE VAPP_UPLOADED_TEMP SET GRP_ID=(SELECT GRP_MST_ID FROM "
 			+ "VAPP_GROUP_MASTER WHERE LEDGER=?) WHERE GRP_ID=-1 and LEDGER=?";
 	static final String UPDATE_IGNORE_SQL="UPDATE VAPP_IGNORE_LEDGER SET LEDGER=? where LEDGER=?";
@@ -382,7 +384,7 @@ public class VAPPDaoImpl implements VAPPDao {
     	int i=0;
     	try {
     		conn = getVAPPConnection();
-    		stmt=conn.prepareStatement(DEL_TEMP_SQL);
+    		stmt=conn.prepareStatement(UPD_GRP_TEMP_SQL);
 			stmt.setString(1, groupData.getLedger());
 			stmt.executeUpdate();
 			
@@ -390,6 +392,33 @@ public class VAPPDaoImpl implements VAPPDao {
 				stmt.close();
 			stmt=conn.prepareStatement(DEL_GRP_SQL);
 			stmt.setString(1, groupData.getLedger());
+			i=stmt.executeUpdate();
+			getGroupMasterData(conn);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}finally{
+			try{
+				if(stmt!=null)
+					stmt.close();
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+		}
+    	return i;
+	}
+	
+	public int updateGroupMasterData(GroupData groupData) {
+		Connection conn=null;
+    	PreparedStatement stmt=null;
+    	int i=0;
+    	try {
+    		conn = getVAPPConnection();
+    		stmt=conn.prepareStatement(UPD_GRP_SQL);
+			stmt.setString(1, groupData.getMainGroup());
+			stmt.setString(2, groupData.getMisGroup());
+			stmt.setString(3, groupData.getLedger());
 			i=stmt.executeUpdate();
 			getGroupMasterData(conn);
 		} catch (SQLException e) {

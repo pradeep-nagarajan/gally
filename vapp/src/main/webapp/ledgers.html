@@ -92,8 +92,10 @@
 		}
 		
 		function updateData(ledger){
-			$('#ledger').val(allData[ledger-1]);
-			$('#updLedger').val(allData[ledger-1]);
+			var temp=allData[ledger-1].split("~`");
+			$('#mainGrp').val(temp[0]);
+			$('#misGrp').val(temp[1]);
+			$('#ledger').val(temp[2]);
 			$('#myModal2').modal('show');
 		}
 		
@@ -108,12 +110,11 @@
 		}
 		
 		function sendUpdateData(){
-			if($('#ledger').val()!=$('#updledger').val()){
-				var data={"ledger":$('#ledger').val(),
-						"newLedger" : $('#updLedger').val(),
-						"mode":"U"};
-				getPOSTJson('updateignoreledger','ignoreUpd', data);
-			}
+			var data={"ledger":$('#ledger').val(),
+					"mainGroup" : $('#mainGrp').val(),
+					"misGroup" : $('#misGrp').val(),
+					"mode":"U"};
+			getPOSTJson('updgrpdata','grpUpd', data);
 		}
 		
 	</script>
@@ -324,8 +325,13 @@
 						</div>
 						<div class="modal-body">
 							<p class="highlight">
-								Previous: <input type="text" readonly="readonly" id="ledger" /><br><br>
-								Ledger : <input type="text" id="updLedger" />
+								<table>
+								<tr><td>Main Group 	: </td><td><input type="text" size="50" id="mainGrp" /></td></tr>
+								<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+								<tr><td>MIS Group 	: </td><td><input type="text" size="50" id="misGrp" /></td></tr>
+								<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+								<tr><td>Ledger Name	: </td><td><input type="text" size="50" readonly="readonly" id="ledger" /></td></tr>
+								</table>
 							</p>
 						</div>
 						<div class="modal-footer">

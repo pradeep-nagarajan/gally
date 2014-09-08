@@ -96,6 +96,9 @@ public class VAPPController {
 		 else if("I".equalsIgnoreCase(groupData.getMode()))
 			 return new ResponseEntity(constructCallback(callback, vappSrv.insertGroupMasterData(groupData)), new HttpHeaders(),
 					HttpStatus.OK);
+		 else if("U".equalsIgnoreCase(groupData.getMode()))
+			 return new ResponseEntity(constructCallback(callback, vappSrv.updateGroupMasterData(groupData)), new HttpHeaders(),
+					HttpStatus.OK);
 		 else
 			return new ResponseEntity(constructCallback(callback, "Error"), new HttpHeaders(),
 						HttpStatus.OK);
