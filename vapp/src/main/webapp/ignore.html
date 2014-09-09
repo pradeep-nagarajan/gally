@@ -11,9 +11,10 @@
 <link rel="stylesheet" type="text/css"
 	href="lib/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
-
+<link rel="stylesheet" href="stylesheets/jqpagination.css">
 <script src="lib/jquery-1.11.1.min.js" type="text/javascript"></script>
 <script src="lib/ajaxcall.js" type="text/javascript"></script>
+<script src="lib/jqpagination.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="stylesheets/theme.css">
 
 </head>
@@ -43,13 +44,22 @@
 				'<a href="javascript:deleteData('+i+')"><i class="fa fa-trash-o"></i></a></td></tr>');
 			}
 			
-			$("#paginate").empty();
+			/*$("#paginate").empty();
 			if(Math.ceil(ignoreLedgerArr.length/5)>1){
 				$("#paginate").append('<li><a href="javascript:findPageData(1)">&laquo;</a></li>');
 				for(i=1;i<=Math.ceil(ignoreLedgerArr.length/5);i++){
 					$("#paginate").append('<li><a href="javascript:findPageData('+i+')">'+i+'</a></li>')
 				}
 				$("#paginate").append('<li><a href="javascript:findPageData('+Math.ceil(ignoreLedgerArr.length/5)+')">&raquo;</a></li>');	
+			}*/
+			if(Math.ceil(ignoreLedgerArr.length/5)>1){
+				$('.jqpagination').jqPagination({
+			    	max_page	: Math.ceil(ignoreLedgerArr.length/5),
+			    	paged		: function(page) {
+			    		//$('#output').append('<li>Requested page ' + page + '</li>');
+			    		findPageData(page);
+			    	}
+			    });
 			}
 			
 		}
@@ -238,9 +248,25 @@
 				</tbody>
 			</table>
 
-			<ul class="pagination" id="paginate">
+			<!-- <ul class="pagination" id="paginate">
 				
-			</ul>
+			</ul> -->
+			
+			<div id="pagination" class="jqpagination" style="margin-left: 43%; margin-top: 10px">
+			    <a href="#" class="first" data-action="first">
+		        &laquo;
+		      </a>
+			    <a href="#" class="previous" data-action="previous">
+		        &lsaquo;
+		      </a>
+			    <input type="text" readonly="readonly" />
+			    <a href="#" class="next" data-action="next">
+		        &rsaquo;
+		      </a>
+			    <a href="#" class="last" data-action="last">
+		        &raquo;
+		      </a>
+			</div>
 
 			<div class="modal small fade" id="myModal" tabindex="-1"
 				role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
