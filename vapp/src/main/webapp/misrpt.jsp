@@ -37,7 +37,7 @@
 		}
 		
 		function genMISRpt(){
-			var url='/vapp/genmisrpt?fromDate='+$('#fromDate').val()+'&toDate='+$('#toDate').val();
+			var url='/vapp/genmisrpt?fromDate='+$('#fromDate').val()+'&toDate='+$('#toDate').val()+'&type='+$('#reportId').val();
 			return url;
 		}
 		

@@ -22,11 +22,12 @@ public interface VAPPDao {
 	public List<String> getIgnoreLedger();
 	public Connection getVAPPConnection() throws ClassNotFoundException, SQLException;
 	public List<String> getTempData();
-	public Map<String, List<Object>> getMISData(String fromDate, String toDate);
 	public void getGroupMasterData(Connection conn);
 	public int insertGroupMasterData(GroupData groupData);
 	public Map<String, Set<String>> getGroupLIst();
 	public int deleteGroupMasterData(GroupData groupData);
 	public int updateGroupMasterData(GroupData groupData);
+	public Map<String, List<Object>> getMISData(String fromDate, String toDate);
+	public Map<String, List<Object>> getPLReport(String fromDate, String toDate);
 }
 

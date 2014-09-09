@@ -108,9 +108,15 @@ public class VAPPController {
 	 @RequestMapping(value = "/genmisrpt", method = RequestMethod.GET)
 	  public void getMISReport(
 	      @RequestParam(value = "fromDate", required = true) String fromDate,
-	      @RequestParam(value = "toDate", required = true) String toDate, HttpServletResponse response)
+	      @RequestParam(value = "toDate", required = true) String toDate,
+	      @RequestParam(value = "type", required = true) String type,
+	      HttpServletResponse response)
 	  {
-		 String filePath=vappSrv.getMISData(fromDate, toDate);
+		 String filePath;
+		 if("Net TB".equalsIgnoreCase(type))
+			 filePath=vappSrv.getMISData(fromDate, toDate);
+		 else
+			 filePath=vappSrv.getPLReport(fromDate, toDate);
 		 System.out.println(filePath);
 		 response.setHeader("Content-Type", "application/xlsx");
 		 response.setHeader("Content-Disposition", "attachment; filename="+filePath.substring(filePath.lastIndexOf("/")+1));
