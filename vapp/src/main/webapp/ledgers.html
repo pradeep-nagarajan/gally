@@ -70,7 +70,8 @@
 		function grpUpdDataPush(data){
 			if(data.result[0]=="true"){
 				alert('Data Updated successfully!');
-				grpDetailsDataPush(data)
+				grpDetailsDataPush(data);
+				$('.jqpagination').jqPagination('option', 'current_page', 1);
 			}else
 				alert('Data NOT Updated successfully!');
 		}
@@ -257,9 +258,9 @@
 				<thead>
 					<tr>
 						<th style="width: 3.5em;">#</th>
-						<th>Main Group</th>
-						<th>MIS Group</th>
-						<th>Ledgers</th>
+						<th style="width: 25%">Main Group</th>
+						<th style="width: 25%">MIS Group</th>
+						<th style="width: 25%">Ledgers</th>
 					</tr>
 				</thead>
 				<tbody id="tabbody">
