@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.springframework.stereotype.Component;
@@ -49,12 +50,12 @@ public class VAPPDaoImpl implements VAPPDao {
 			+ "and grp_mst_id=grp_id "
 			+ "group by temp.ledger||'~`'||master.MIS_GRP, txn_date "
 			+ "order by to_char(TXN_DATE,'YYYYMMDD'), misledge";
-	static final String PL_TEMP_SQL="SELECT MIS_GRP,TO_CHAR (txn_date, 'Mon-YY'),SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) amount "
+	static final String PL_TEMP_SQL="SELECT DECODE(main_grp,'Revenue','AAAAAB',main_grp)||'~`'||MIS_GRP,TO_CHAR (txn_date, 'Mon-YY'),SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) amount "
 			+"FROM vapp_uploaded_temp, vapp_group_master "
 			+"WHERE grp_mst_id = grp_id AND TXN_DATE between to_date(?,'DD-MM-YYYY') and to_date(?,'DD-MM-YYYY') "
-			+ "AND main_grp = 'Revenue' "
-			+"group by MIS_GRP,TXN_DATE "
-			+ "order by to_char(TXN_DATE,'YYYYMMDD'), MIS_GRP";
+			//+ "AND main_grp = 'Revenue' "
+			+"group by DECODE(main_grp,'Revenue','AAAAAB',main_grp)||'~`'||MIS_GRP,TXN_DATE "
+			+ "order by to_char(TXN_DATE,'YYYYMMDD'), 1";
 
 	static Map<String, Integer> hm = new HashMap<String, Integer>();
 	static List<String> ignoreLedger = new ArrayList<String>();
@@ -449,9 +450,9 @@ public class VAPPDaoImpl implements VAPPDao {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
-		Map<String, List<Object>> data = new LinkedHashMap<String, List<Object>>();
+		Map<String, List<Object>> data = new TreeMap<String, List<Object>>();
 		List<Object> headerRowData = new ArrayList<Object>();
-		data.put("Ledger~`MIS Grouping", headerRowData);
+		data.put("AAAAAA", headerRowData);
 		int colIndex = -1;
 		String prevDate = "";
 
@@ -467,7 +468,7 @@ public class VAPPDaoImpl implements VAPPDao {
 					colIndex++;
 					prevDate = rset.getString(2);
 					headerRowData.add(prevDate);
-					data.put("Ledger~`MIS Grouping", headerRowData);
+					data.put("AAAAAA", headerRowData);
 				}
 				List<Object> rowData;
 				if (data.containsKey(rset.getString(1)))
@@ -503,9 +504,9 @@ public class VAPPDaoImpl implements VAPPDao {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
-		Map<String, List<Object>> data = new LinkedHashMap<String, List<Object>>();
+		Map<String, List<Object>> data = new TreeMap<String, List<Object>>();
 		List<Object> headerRowData = new ArrayList<Object>();
-		data.put("Profit & Loss Statement", headerRowData);
+		data.put("AAAAAA", headerRowData);
 		int colIndex = -1;
 		String prevDate = "";
 
@@ -521,7 +522,7 @@ public class VAPPDaoImpl implements VAPPDao {
 					colIndex++;
 					prevDate = rset.getString(2);
 					headerRowData.add(prevDate);
-					data.put("Profit & Loss Statement", headerRowData);
+					data.put("AAAAAA", headerRowData);
 				}
 				List<Object> rowData;
 				if (data.containsKey(rset.getString(1)))

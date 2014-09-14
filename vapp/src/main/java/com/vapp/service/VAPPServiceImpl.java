@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
@@ -217,7 +218,7 @@ public class VAPPServiceImpl implements VAPPService
 			FileOutputStream out = new FileOutputStream(new File(fileName));
 			data=vappDao.getMISData(fromDate, toDate);
 		
-			int colIndex = data.get("Ledger~`MIS Grouping").size()-1;
+			int colIndex = data.get("AAAAAA").size()-1;
 			
 			// Blank workbook
 			XSSFWorkbook workbook = new XSSFWorkbook();
@@ -241,9 +242,14 @@ public class VAPPServiceImpl implements VAPPService
 				List<Object> objArr = data.get(key);
 				if (rownum > 0) {
 					Cell cell = row.createCell(0);
-					cell.setCellValue(key.substring(0, key.indexOf("~`")));
 					Cell cell2 = row.createCell(1);
-					cell2.setCellValue(key.substring(key.indexOf("~`")+2));
+					if("AAAAAA".equalsIgnoreCase(key)){
+						cell.setCellValue("Ledger");
+						cell2.setCellValue("MIS Grouping");
+					}else{
+						cell.setCellValue(key.substring(0, key.indexOf("~`")));
+						cell2.setCellValue(key.substring(key.indexOf("~`")+2));
+					}
 				}
 				int cellnum = 2;
 				for (Object obj : objArr) {
@@ -283,7 +289,7 @@ public class VAPPServiceImpl implements VAPPService
 				}
 			}
 			Row row = sheet.createRow(rownum++);
-			int currColIndex=((data.get("Ledger~`MIS Grouping").size())*2)+1;
+			int currColIndex=((data.get("AAAAAA").size())*2)+1;
 			//Calculate Grant Total
 			for (int i = 0; i <= currColIndex; i++) {
 				Cell cell = row.createCell(i);
@@ -296,7 +302,8 @@ public class VAPPServiceImpl implements VAPPService
 					cell.setCellStyle(numberCs);
 				}
 			}
-
+			for(int i=0;i<=currColIndex;i++)
+				sheet.autoSizeColumn(i);
 			
 				workbook.write(out);
 			} catch (IOException e) {
@@ -334,13 +341,16 @@ public class VAPPServiceImpl implements VAPPService
 	public String getPLReport(String fromDate, String toDate) {
 		String fileName="D:/VAPP/tmp/PL_"+fromDate+"_to_"+toDate+".xlsx";
 		Map<String, List<Object>> data = new LinkedHashMap<String, List<Object>>();
-		String prevDate = "";
+		String prevGroup = "";
+		int startRow = 0,revenueRow=0,operRow=0;
+		
 		Character[] excelCol = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
 				'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T' };
 		try {
 			FileOutputStream out = new FileOutputStream(new File(fileName));
 			data=vappDao.getPLReport(fromDate, toDate);
-			int colIndex = data.get("Profit & Loss Statement").size()-1;
+			
+			int colIndex = data.get("AAAAAA").size()-1;
 			
 			// Blank workbook
 			XSSFWorkbook workbook = new XSSFWorkbook();
@@ -355,12 +365,44 @@ public class VAPPServiceImpl implements VAPPService
 			centerCs.setFont(font);
 			XSSFCellStyle boldCs=workbook.createCellStyle();
 			boldCs.setFont(font);
+			
 			XSSFDataFormat df =workbook.createDataFormat();
 			XSSFCellStyle numberCs=workbook.createCellStyle();
 			numberCs.setDataFormat(df.getFormat("_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)"));
 			XSSFCellStyle boldNumberCs=workbook.createCellStyle();
 			boldNumberCs.setDataFormat(df.getFormat("_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)"));
 			boldNumberCs.setFont(font);
+			
+			CellStyle fillStyle = workbook.createCellStyle();
+			fillStyle.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
+			fillStyle.setBorderBottom(XSSFCellStyle.BORDER_THIN);
+			fillStyle.setDataFormat(df.getFormat("_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)"));
+			fillStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
+			fillStyle.setFont(font);
+			
+			CellStyle fillTotStyle = workbook.createCellStyle();
+			fillTotStyle.setFillForegroundColor(IndexedColors.CORNFLOWER_BLUE.getIndex());
+			fillTotStyle.setDataFormat(df.getFormat("_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)"));
+			fillTotStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
+			fillTotStyle.setBorderTop(XSSFCellStyle.BORDER_THICK);
+			fillTotStyle.setFont(font);
+			
+			CellStyle fillPerStyle = workbook.createCellStyle();
+			fillPerStyle.setFillForegroundColor(IndexedColors.CORNFLOWER_BLUE.getIndex());
+			fillPerStyle.setDataFormat(df.getFormat("0%"));
+			fillPerStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
+			fillPerStyle.setBorderBottom(XSSFCellStyle.BORDER_DOUBLE);
+			fillPerStyle.setFont(font);
+			
+			XSSFFont whiteFont=workbook.createFont();
+			whiteFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+			whiteFont.setColor(IndexedColors.WHITE.getIndex());
+			CellStyle headerFillStyle = workbook.createCellStyle();
+			headerFillStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			headerFillStyle.setFillForegroundColor(IndexedColors.BLACK.getIndex());
+			headerFillStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
+			headerFillStyle.setFont(whiteFont);
+			
 			// Iterate over data and write to sheet
 			Set<String> keyset = data.keySet();
 			int rownum = 0;
@@ -370,16 +412,51 @@ public class VAPPServiceImpl implements VAPPService
 				
 				if (rownum > 0) {
 					Cell cell = row.createCell(0);
-					cell.setCellValue(key);
-					if(rownum==1)
-						cell.setCellStyle(boldCs);
+					if("AAAAAA".equalsIgnoreCase(key))
+						cell.setCellValue("Profit & Loss Statement");
+					else{
+						String[] grps=key.split("~`");
+						if("AAAAAB".equalsIgnoreCase(grps[0])){
+							grps[0]="Revenue";
+							startRow=rownum;
+						}
+						if(prevGroup.equalsIgnoreCase(grps[0]))
+							cell.setCellValue(grps[1]);
+						else{
+							if(prevGroup.equalsIgnoreCase("Revenue")){
+								cell.setCellValue("Total Revenue");
+								cell.setCellStyle(fillStyle);
+								
+								for(int h=0;h<=colIndex+1;h++){
+									cell = row.createCell(h+1);
+									cell.setCellFormula("SUM("+ excelCol[h] + startRow + ":"
+											+ excelCol[h] + (rownum-2) + ")");
+									cell.setCellStyle(fillStyle);
+								}
+								revenueRow=rownum;
+								row = sheet.createRow(rownum++);
+								cell = row.createCell(0);
+								startRow=rownum+1;
+							}
+							cell.setCellValue(grps[0]);
+							cell.setCellStyle(boldCs);
+							row = sheet.createRow(rownum++);
+							cell = row.createCell(0);
+							cell.setCellValue(grps[1]);
+							prevGroup=grps[0];
+						}
+					}
+					if(rownum<=1)
+						cell.setCellStyle(headerFillStyle);
 				}
 				
 				int cellnum = 1;
 				for (Object obj : objArr) {
 					Cell cell = row.createCell(cellnum++);
 					if (obj instanceof String){
-						if(((String)obj).indexOf("-")>-1)
+						if(((String)obj).indexOf("-")>-1 && ((String)obj).length()>1)
+							cell.setCellStyle(headerFillStyle);
+						else if(((String)obj).indexOf("-")>-1)
 							cell.setCellStyle(centerCs);
 						cell.setCellValue((String) obj);
 					}
@@ -397,52 +474,59 @@ public class VAPPServiceImpl implements VAPPService
 					cell.setCellStyle(centerCs);
 					colSize++;
 				}
-
-				/*for (int i = 0; i <= colIndex; i++) {
-					Cell cell = row.createCell(cellnum++);
-					if (rownum > 1){
-						cell.setCellFormula("SUM(B" + rownum + ":"
-								+ excelCol[i] + rownum + ")");
-						cell.setCellStyle(numberCs);
-					}
-					else{
-						cell.setCellValue("YTD AS ON " + objArr.get(i));
-						cell.setCellStyle(centerCs);
-					}
-					
-				}*/
+				
 				if(rownum==1){
 					Cell cell = row.createCell(cellnum++);
-					cell.setCellStyle(centerCs);
-					cell.setCellValue("YTD");
+					cell.setCellStyle(headerFillStyle);
+					cell.setCellValue("YTD AS ON "+toDate);
 				}else{
 					Cell cell = row.createCell(cellnum++);
 					cell.setCellFormula("SUM(B" + rownum + ":"
 							+ excelCol[colIndex] + rownum + ")");
 					cell.setCellStyle(boldNumberCs);
 				}
-				if(rownum==1){
-					row = sheet.createRow(rownum++);
-					Cell cell = row.createCell(0);
-					cell.setCellValue("Revenue");
-					cell.setCellStyle(boldCs);
-				}
+				
 			}
 			Row row = sheet.createRow(rownum++);
-			int currColIndex=((data.get("Profit & Loss Statement").size())*1)+1;
+			int currColIndex=((data.get("AAAAAA").size())*1)+1;
 			//Calculate Grant Total
 			for (int i = 0; i <= currColIndex; i++) {
 				Cell cell = row.createCell(i);
 				if(i==0){
-					cell.setCellValue("Total Revenue");
-					cell.setCellStyle(boldCs);
+					cell.setCellValue("Operating Expense");
+					cell.setCellStyle(fillStyle);
 				}else{
-					cell.setCellFormula("SUM("+ excelCol[i-1]+"2" + ":"
+					cell.setCellFormula("SUM("+ excelCol[i-1]+startRow + ":"
 							+ excelCol[i-1] + (rownum-1) + ")");
-					cell.setCellStyle(boldNumberCs);
+					cell.setCellStyle(fillStyle);
 				}
 			}
-
+			operRow=rownum;
+			row = sheet.createRow(rownum++);
+			for (int i = 0; i <= currColIndex; i++) {
+				Cell cell = row.createCell(i);
+				if(i==0){
+					cell.setCellValue("Operating Profit/(Loss)");
+					cell.setCellStyle(fillTotStyle);
+				}else{
+					cell.setCellFormula("+"+excelCol[i-1]+revenueRow+"-"+excelCol[i-1]+operRow);
+					cell.setCellStyle(fillTotStyle);
+				}
+			}
+			row = sheet.createRow(rownum++);
+			for (int i = 0; i <= currColIndex; i++) {
+				Cell cell = row.createCell(i);
+				if(i==0){
+					cell.setCellValue("Margin %");
+					cell.setCellStyle(fillPerStyle);
+				}else{
+					cell.setCellFormula("IFERROR("+excelCol[i-1]+(rownum-1)+"/"+excelCol[i-1]+"$"+revenueRow+",0)");
+					cell.setCellStyle(fillPerStyle);
+				}
+			}
+			
+			for(int i=0;i<=currColIndex;i++)
+				sheet.autoSizeColumn(i);
 			
 				workbook.write(out);
 			} catch (IOException e) {
