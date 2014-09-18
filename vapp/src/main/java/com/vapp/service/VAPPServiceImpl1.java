@@ -35,15 +35,11 @@ import com.vapp.dao.VAPPDao;
 import com.vapp.model.GroupData;
 import com.vapp.model.MasterData;
 
-@Service
-public class Test implements VAPPService
+
+public class VAPPServiceImpl1 implements VAPPService
 {
 	@Autowired
 	private VAPPDao vappDao;
-	
-	Character[] plExcelCol = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-			'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T' };
-	
     public boolean readAndInsert(String fileName,String fileFullPath){
     	Connection conn=null;
     	boolean result=false;
@@ -348,7 +344,8 @@ public class Test implements VAPPService
 		String prevGroup = "";
 		int startRow = 0,revenueRow=0,operRow=0;
 		
-		
+		Character[] excelCol = { 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+				'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T' };
 		try {
 			FileOutputStream out = new FileOutputStream(new File(fileName));
 			data=vappDao.getPLReport(fromDate, toDate);
@@ -432,8 +429,8 @@ public class Test implements VAPPService
 								
 								for(int h=0;h<=colIndex+1;h++){
 									cell = row.createCell(h+1);
-									cell.setCellFormula("SUM("+ plExcelCol[h] + startRow + ":"
-											+ plExcelCol[h] + (rownum-2) + ")");
+									cell.setCellFormula("SUM("+ excelCol[h] + startRow + ":"
+											+ excelCol[h] + (rownum-2) + ")");
 									cell.setCellStyle(fillStyle);
 								}
 								revenueRow=rownum;
@@ -485,7 +482,7 @@ public class Test implements VAPPService
 				}else{
 					Cell cell = row.createCell(cellnum++);
 					cell.setCellFormula("SUM(B" + rownum + ":"
-							+ plExcelCol[colIndex] + rownum + ")");
+							+ excelCol[colIndex] + rownum + ")");
 					cell.setCellStyle(boldNumberCs);
 				}
 				
@@ -499,143 +496,35 @@ public class Test implements VAPPService
 					cell.setCellValue("Operating Expense");
 					cell.setCellStyle(fillStyle);
 				}else{
-					cell.setCellFormula("SUM("+ plExcelCol[i-1]+startRow + ":"
-							+ plExcelCol[i-1] + (rownum-1) + ")");
+					cell.setCellFormula("SUM("+ excelCol[i-1]+startRow + ":"
+							+ excelCol[i-1] + (rownum-1) + ")");
 					cell.setCellStyle(fillStyle);
 				}
 			}
 			operRow=rownum;
 			row = sheet.createRow(rownum++);
-			createSumRow(row, currColIndex, fillTotStyle, revenueRow, operRow, rownum, "Operating Profit/(Loss)", "+");
-			
-			row = sheet.createRow(rownum++);
-			createPerRow(row, currColIndex, fillPerStyle, revenueRow, rownum, "Margin %");
-			
-			int corpRow=0;
-			if(data.containsKey("Coporate Overheads~`Coporate Overheads")){
-				row = sheet.createRow(rownum++);
-				corpRow=rownum;
-				List<Object> objArr = data.get("Coporate Overheads~`Coporate Overheads");
-				Cell cell = row.createCell(0);
-				cell.setCellValue("Coporate Overheads");
-				createRow(row, "Coporate Overheads", objArr, headerFillStyle, centerCs, boldNumberCs);
-			}
-			
-			row = sheet.createRow(rownum++);
-			createSumRow(row, currColIndex, fillStyle, operRow, corpRow, rownum, "TOTAL OPERATING COSTS", "+");
-			int operCostRow=rownum;
-			
-			row = sheet.createRow(rownum++);
-			createSumRow(row, currColIndex, fillTotStyle, revenueRow, (rownum-1), rownum, "EBITDA", "");
-			int ebitdaRow=rownum;
-			
-			row = sheet.createRow(rownum++);
-			createPerRow(row, currColIndex, fillPerStyle, revenueRow, (rownum-1), "EBITDA %");
-			
-			int depreRow=0;
-			if(data.containsKey("Depreciation~`Depreciation")){
-				row = sheet.createRow(rownum++);
-				depreRow=rownum;
-				List<Object> objArr = data.get("Depreciation~`Depreciation");
-				Cell cell = row.createCell(0);
-				cell.setCellValue("Depreciation");
-				createRow(row, "Depreciation", objArr, headerFillStyle, centerCs, boldNumberCs);
-			}
-			
-			row = sheet.createRow(rownum++);
-			createSumRow(row, currColIndex, fillTotStyle, ebitdaRow, depreRow, rownum, "EBIT", "+");
-			
-			row = sheet.createRow(rownum++);
-			createPerRow(row, currColIndex, fillPerStyle, revenueRow, (rownum-1), "EBIT %");
-			
-			int intRow=0;
-			if(data.containsKey("Interest~`Interest")){
-				row = sheet.createRow(rownum++);
-				intRow=rownum;
-				List<Object> objArr = data.get("Interest~`Interest");
-				Cell cell = row.createCell(0);
-				cell.setCellValue("Interest");
-				createRow(row, "Interest", objArr, headerFillStyle, centerCs, boldNumberCs);
-			}
-			
-			int minIntRow=0;
-			if(data.containsKey("Minority Interest~`Minority Interest")){
-				row = sheet.createRow(rownum++);
-				minIntRow=rownum;
-				List<Object> objArr = data.get("Minority Interest~`Minority Interest");
-				Cell cell = row.createCell(0);
-				cell.setCellValue("Minority Interest");
-				createRow(row, "Minority Interest", objArr, headerFillStyle, centerCs, boldNumberCs);
-			}
-			row = sheet.createRow(rownum++);
-			for (int i = 0; i <= colIndex; i++) {
+			for (int i = 0; i <= currColIndex; i++) {
 				Cell cell = row.createCell(i);
 				if(i==0){
-					cell.setCellValue("TOTAL COSTS");
-					cell.setCellStyle(fillStyle);
-				}else{
-					String formula="+"+plExcelCol[i-1]+operCostRow;
-					if(depreRow>0)
-						formula+="+"+plExcelCol[i-1]+depreRow;
-					if(intRow>0)
-						formula+="+"+plExcelCol[i-1]+intRow;
-					if(minIntRow>0)
-						formula+="+"+plExcelCol[i-1]+minIntRow;
-					cell.setCellFormula(formula);
-					cell.setCellStyle(fillStyle);
-				}
-			}
-			
-			row = sheet.createRow(rownum++);
-			for (int i = 0; i <= colIndex; i++) {
-				Cell cell = row.createCell(i);
-				if(i==0){
-					cell.setCellValue("PBT");
+					cell.setCellValue("Operating Profit/(Loss)");
 					cell.setCellStyle(fillTotStyle);
 				}else{
-					String formula=+plExcelCol[i-1]+revenueRow+"-"+plExcelCol[i-1]+operCostRow;
-					if(depreRow>0)
-						formula+="-"+plExcelCol[i-1]+depreRow;
-					if(intRow>0)
-						formula+="-"+plExcelCol[i-1]+intRow;
-					cell.setCellFormula(formula);
-					cell.setCellStyle(fillStyle);
+					cell.setCellFormula("+"+excelCol[i-1]+revenueRow+"-"+excelCol[i-1]+operRow);
+					cell.setCellStyle(fillTotStyle);
 				}
 			}
-			int pbtRow=rownum;
-			
 			row = sheet.createRow(rownum++);
-			createPerRow(row, currColIndex, fillPerStyle, revenueRow, (rownum-1), "PBT %");
-			
-			int taxRow=0;
-			if(data.containsKey("Taxes~`Taxes")){
-				row = sheet.createRow(rownum++);
-				taxRow=rownum;
-				List<Object> objArr = data.get("Taxes~`Taxes");
-				Cell cell = row.createCell(0);
-				cell.setCellValue("Taxes");
-				createRow(row, "Taxes", objArr, headerFillStyle, centerCs, boldNumberCs);
-			}
-			row = sheet.createRow(rownum++);
-			for (int i = 0; i <= colIndex; i++) {
+			for (int i = 0; i <= currColIndex; i++) {
 				Cell cell = row.createCell(i);
 				if(i==0){
-					cell.setCellValue("PAT");
-					cell.setCellStyle(fillTotStyle);
+					cell.setCellValue("Margin %");
+					cell.setCellStyle(fillPerStyle);
 				}else{
-					String formula="+"+plExcelCol[i-1]+pbtRow;
-					
-					if(taxRow>0)
-						formula+="-"+plExcelCol[i-1]+taxRow;
-					cell.setCellFormula(formula);
-					cell.setCellStyle(fillStyle);
+					cell.setCellFormula("IFERROR("+excelCol[i-1]+(rownum-1)+"/"+excelCol[i-1]+"$"+revenueRow+",0)");
+					cell.setCellStyle(fillPerStyle);
 				}
 			}
 			
-			row = sheet.createRow(rownum++);
-			createPerRow(row, currColIndex, fillPerStyle, revenueRow, (rownum-1), "PAT %");
-			
-				
 			for(int i=0;i<=currColIndex;i++)
 				sheet.autoSizeColumn(i);
 			
@@ -647,58 +536,5 @@ public class Test implements VAPPService
 			System.out.println("data2.xlsx written successfully on disk.");
 		return fileName;
 	}
-	
-	public void createSumRow(Row row, int colIndex, CellStyle fillStyle, int mainRow, int optionalRow, int rownum, String name, String symb){
-		for (int i = 0; i <= colIndex; i++) {
-			Cell cell = row.createCell(i);
-			if(i==0){
-				cell.setCellValue("TOTAL OPERATING COSTS");
-				cell.setCellStyle(fillStyle);
-			}else{
-				if(optionalRow==0)
-					cell.setCellValue(plExcelCol[i-1]+mainRow);
-				else
-					cell.setCellFormula(symb+plExcelCol[i-1]+mainRow+"+"+plExcelCol[i-1]+optionalRow);
-				cell.setCellStyle(fillStyle);
-			}
-		}
-	}
-	
-	public void createPerRow(Row row, int colIndex, CellStyle fillPerStyle, int revenueRow, int rownum, String name){
-		for (int i = 0; i <= colIndex; i++) {
-			Cell cell = row.createCell(i);
-			if(i==0){
-				cell.setCellValue(name);
-				cell.setCellStyle(fillPerStyle);
-			}else{
-				cell.setCellFormula("IFERROR("+plExcelCol[i-1]+(rownum-1)+"/"+plExcelCol[i-1]+"$"+revenueRow+",0)");
-				cell.setCellStyle(fillPerStyle);
-			}
-		}
-	}
-	
-	public void createRow(Row row, String name,List<Object> objArr, CellStyle headerFillStyle, XSSFCellStyle centerCs, XSSFCellStyle numberCs){
-		
-		Cell cell = row.createCell(0);
-		cell.setCellValue(name);
-		int cellnum = 1;
-		for (Object obj : objArr) {
-			cell = row.createCell(cellnum++);
-			if (obj instanceof String){
-				if(((String)obj).indexOf("-")>-1 && ((String)obj).length()>1)
-					cell.setCellStyle(headerFillStyle);
-				else if(((String)obj).indexOf("-")>-1)
-					cell.setCellStyle(centerCs);
-				cell.setCellValue((String) obj);
-			}
-			else if (obj instanceof Integer)
-				cell.setCellValue((Integer) obj);
-			else if (obj instanceof Double){
-				cell.setCellValue((Double) obj);
-				cell.setCellStyle(numberCs);
-			}
-		}
-	}
-	
     
 }
