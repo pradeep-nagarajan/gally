@@ -17,9 +17,10 @@ public interface VAPPService {
 	public Map<String, Object> updateIgnoreLedger(String ledger, String newLedger);
 	public List<String> getTempData();
 	public Map<String, Set<String>> insertGroupMasterData(GroupData groupData);
-	public String getMISData(String fromDate, String toDate);
+	//public String getMISData(String fromDate, String toDate);
 	public Map<String, Set<String>> getGroupLIst();
 	public Map<String, Set<String>> deleteGroupMasterData(GroupData groupData);
 	public Map<String, Set<String>> updateGroupMasterData(GroupData groupData);
-	public String getPLReport(String fromDate, String toDate);
+	//public String getPLReport(String fromDate, String toDate);
+	public String getAllReport(String fromDate, String toDate, String type);
 }

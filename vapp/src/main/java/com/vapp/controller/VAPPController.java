@@ -114,9 +114,11 @@ public class VAPPController {
 	  {
 		 String filePath;
 		 if("Net TB".equalsIgnoreCase(type))
-			 filePath=vappSrv.getMISData(fromDate, toDate);
+			 filePath=vappSrv.getAllReport(fromDate, toDate,"NET_TB");
+		 else if("Profit and Loss".equalsIgnoreCase(type))
+			 filePath=vappSrv.getAllReport(fromDate, toDate,"PL");
 		 else
-			 filePath=vappSrv.getPLReport(fromDate, toDate);
+			 filePath=vappSrv.getAllReport(fromDate, toDate,"MIS");
 		 System.out.println(filePath);
 		 response.setHeader("Content-Type", "application/xlsx");
 		 response.setHeader("Content-Disposition", "attachment; filename="+filePath.substring(filePath.lastIndexOf("/")+1));
