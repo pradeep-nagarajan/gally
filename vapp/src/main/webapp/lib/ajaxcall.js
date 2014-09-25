@@ -18,6 +18,16 @@ function getJson(url, mname) {
     });
 }
 
+Highcharts.setOptions({
+    chart: {
+        style: {
+            fontFamily: 'Arial',
+            color: '#565656'
+        }
+    },
+    global: { useUTC: false }
+});
+
 function getPOSTJson(url, mname, dataString) {
 	$.when(
 	        $.ajax({

@@ -13,11 +13,16 @@
 	href="lib/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" href="lib/font-awesome/css/font-awesome.css">
 <link href="stylesheets/jquery-ui.css" rel="stylesheet" />
-<script src="lib/jquery-1.11.1.min.js" type="text/javascript"></script>
-<script src="lib/jquery-ui.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="stylesheets/theme.css">
 <link rel="stylesheet" type="text/css" href="stylesheets/vapp.css">
+
+<script src="lib/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="lib/jquery-ui.js" type="text/javascript"></script>
+<script src="lib/highcharts.js" type="text/javascript"></script>
+<script src="lib/exporting.js" type="text/javascript"></script>
 <script src="lib/ajaxcall.js" type="text/javascript"></script>
+<script src="lib/donutpiechart.js" type="text/javascript"></script>
+<script src="lib/linechart.js" type="text/javascript"></script>
 
 </head>
 <body class=" theme-blue">
@@ -29,21 +34,57 @@
 			$("#content").css('min-height', ($(window).height() - 111));
 			$("#content").css('min-width', ($(window).width() - 150));
 		});
+		
 		getJson('/vapp/gettempdata', 'temp');
+		var color=["#FFA100", "#8DC63F", "#5DBCF3","#4572A7",
+		"#80699B",
+		"#3D96AE",
+		"#DB843D",
+		"#92A8CD",
+		"#A47D7C",
+		"#B5CA92",
+		"#483D8B",
+		"#8B008B",
+		"#008000",
+		"#191970",
+		"#FF4500"];
 
 		function tempDataPush(data) {
 			if (data.length > 0)
 				window.location.href = 'missing.html';
 		}
 		
-		function genMISRpt(){
-			var url='/vapp/genmisrpt?fromDate='+$('#fromDate').val()+'&toDate='+$('#toDate').val()+'&type='+$('#reportId').val();
-			return url;
+		function generateChart(){
+			if($('#fromDate').val()!="" && $('#toDate').val()!=""){ 
+					var url='/vapp/revenue?fromDate='+$('#fromDate').val()+'&toDate='+$('#toDate').val()+'&type='+$('#reportId').val();
+					getJson(url, 'applyChart');
+			}else{
+				alert('Provide From and To date to generate Chart');
+			}
 		}
 		
-		function RedirectURL()
-		{
-		    window.location= genMISRpt();
+		function applyChartDataPush(result){
+			if(result.piedata!=null && result.piedata!=undefined){
+				$("#myTabContent").show();
+				var dataArr=[];
+				var i=0;
+				$.each(result.piedata, function(index, data) {
+					
+					  var dataString = {                                   
+								name : index,
+								y : data>=0?data:(data*-1),
+								val: data,
+								color: color[i++]
+							};
+					  dataArr.push(dataString);
+				});
+				drawDonutPieChart('piePlot',dataArr,"","Revenue",200,true);
+				drawLineChart('linePlot', result.bardata, 'line');
+				drawLineChart('barPlot', result.bardata, 'column');
+			}else{
+				$("#myTabContent").hide();
+				alert("Data NOT available!");
+			}
 		}
 		
 	</script>
@@ -130,9 +171,9 @@
 			<li><ul class="premium-menu nav nav-list collapse in">
 					<li class="visible-xs visible-sm"><a href="#">- Reporting
 							features are available here -</a></span>
-					<li class="active"><a href="misrpt.jsp"><span
+					<li><a href="misrpt.jsp"><span
 							class="fa fa-caret-right"></span> MIS Report</a></li>
-					<li><a href="stats.jsp"><span
+					<li class="active"><a href="stats.jsp"><span
 							class="fa fa-caret-right"></span> Statistics</a></li>
 				</ul></li>
 
@@ -158,10 +199,10 @@
 	<div class="content" id="content">
 		<div class="header">
 
-			<h1 class="page-title">MIS Report</h1>
+			<h1 class="page-title">Statistics</h1>
 			<ul class="breadcrumb">
 				<li><a href="index.html">Home</a></li>
-				<li class="active">MIS Report</li>
+				<li class="active">Statistics</li>
 			</ul>
 
 		</div>
@@ -171,19 +212,33 @@
 				<div class="row">
 					<div class="col-sm-9 col-md-12">
 						<div class="panel panel-default">
-							<p class="panel-heading">Generate MIS Report</p>
+							<p class="panel-heading">Statistics Chart</p>
 							<div class="panel-body">
 								Transaction Date From: <input type="text" name="fromDate"
 									id="fromDate" style="margin-right: 5px">&nbsp;&nbsp;&nbsp;To&nbsp;&nbsp;
 								<input type="text" name="toDate" id="toDate"
 									style="margin-right: 5px"> <br />
 								<br /> Report Type: <select id="reportId">
-									<option>Net TB</option>
-									<option>Profit and Loss</option>
+									<option>Revenue</option>
+									<option>Operating Expense</option>
 									<option>MIS</option>
 								</select> <br />
 								<br />
-								<a  class="btn btn-primary" href="#" onclick="RedirectURL();return false;">Generate Report</a>
+								<button class="btn btn-primary" onclick="generateChart()">Generate Statistics</button>
+								<br /><br />
+								<div class="main-content grayBord" id="myTabContent">
+									<ul class="nav nav-tabs">
+										<li class="active"><a href="#piePlot" data-toggle="tab">Pie Chart</a></li>
+										<li><a href="#linePlot" data-toggle="tab">Line Chart</a></li>
+										<li><a href="#barPlot" data-toggle="tab">Bar Chart</a></li>
+									</ul>
+									<br/><br/>
+									<div class="tab-content">
+										<div id="piePlot" class="tab-pane active in myChartsDiv"></div>
+										<div id="linePlot" class="tab-pane fade myChartsDiv"></div>
+										<div id="barPlot" class="tab-pane fade in myChartsDiv"></div>
+									</div>
+								</div>
 							</div>
 						</div>
 
@@ -208,13 +263,16 @@
 				buttonImageOnly : true,
 				buttonImage : 'images/calendar.gif'
 			});
+			$("#fromDate").datepicker("setDate",'01-04-2014');
 			$("#toDate").datepicker({
 				showOn : "button",
 				dateFormat : 'dd-mm-yy',
 				buttonImageOnly : true,
 				buttonImage : 'images/calendar.gif'
 			});
+			$("#toDate").datepicker("setDate",'01-09-2014');
 			$("#content").css('min-height',($( window ).height()-111));
+			$("#myTabContent").hide();
 		});
 	</script>
 

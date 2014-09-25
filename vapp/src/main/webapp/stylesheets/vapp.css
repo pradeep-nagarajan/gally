@@ -3,3 +3,14 @@
 	border-spacing: 10px !important;
 	width: 100% !important;
 }
+
+.myChartsDiv{
+height: 325px;
+width: 600px;
+margin-left: 25%;
+display: none; 
+}
+
+.grayBord{
+	border: 1px solid #ddd;	
+}
