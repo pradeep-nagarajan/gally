@@ -1,11 +1,15 @@
 package com.vapp.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,6 +53,51 @@ public class ChartDaoImpl implements ChartDao {
 			}
 		});
 		
+		return listofVal;
+	}
+
+	public Map<String, List<Object>> getOperatingExp(String fromDate,
+			String toDate) {
+		
+		StringBuffer SQL=new StringBuffer();
+		SQL.append("SELECT grp.main_grp, TO_CHAR(txn_date,'Mon-YYYY') TDATE, ")
+		.append("SUM (DECODE (cr_dr, 'CR', '-' ")
+		.append("|| amount, amount)) amount ")
+		.append("FROM vapp_uploaded_temp upload, ")
+		.append("vapp_group_master grp ")
+		.append("WHERE grp.grp_mst_id=upload.grp_id ")
+		.append("AND grp.main_grp != ? ")
+		.append("GROUP BY grp.main_grp, txn_date ")
+		.append("ORDER BY TO_CHAR(txn_date, 'YYYYMMDD')");
+
+		Map<String, List<Object>> listofVal = jdbcTemplate.query(SQL.toString(), new Object[] { "Revenue"/*, fromDate, toDate*/ }, new ResultSetExtractor<Map<String, List<Object>>>() {
+			public Map<String, List<Object>> extractData(ResultSet rs) throws SQLException {
+				Map<String, List<Object>> data = new TreeMap<String, List<Object>>();
+				List<Object> headerRowData = new ArrayList<Object>();
+				data.put("AAAAAA", headerRowData);
+				String prevDate = "";
+
+			while (rs.next()) {
+				
+				if (!prevDate.equalsIgnoreCase(rs.getString(2))) {
+					prevDate = rs.getString(2);
+					headerRowData.add(prevDate);
+					data.put("AAAAAA", headerRowData);
+				}
+				List<Object> rowData;
+				if (data.containsKey(rs.getString(1)))
+					rowData = data.get(rs.getString(1));
+				else
+					rowData = new ArrayList<Object>();
+				for (; rowData.size() < headerRowData.size();)
+					rowData.add(0);
+				rowData.add(rs.getDouble(3));
+				data.put(rs.getString(1), rowData);
+
+			}
+			return data;
+			}
+		});
 		return listofVal;
 	}
 

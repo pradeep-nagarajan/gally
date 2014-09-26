@@ -36,9 +36,8 @@ public class ChartServiceImpl implements ChartService {
 		
 		return result;
 	}
-	public Map<String, Object> getOperatingExp(String fromDate, String toDate) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<String, List<Object>> getOperatingExp(String fromDate, String toDate) {
+		return chartDao.getOperatingExp(fromDate, toDate);
 	}
 
 }

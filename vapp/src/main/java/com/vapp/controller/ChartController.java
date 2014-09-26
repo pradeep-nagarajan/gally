@@ -33,7 +33,7 @@ public class ChartController {
 					HttpStatus.OK);
 		else if ("Operating Expense".equalsIgnoreCase(type))
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getRevenue(fromDate, toDate)), new HttpHeaders(),
+					chartService.getOperatingExp(fromDate, toDate)), new HttpHeaders(),
 					HttpStatus.OK);
 		else
 			return new ResponseEntity(constructCallback(callback,
