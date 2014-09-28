@@ -66,11 +66,13 @@ public class ChartDaoImpl implements ChartDao {
 		.append("FROM vapp_uploaded_temp upload, ")
 		.append("vapp_group_master grp ")
 		.append("WHERE grp.grp_mst_id=upload.grp_id ")
-		.append("AND grp.main_grp != ? ")
+		.append("AND grp.main_grp not in ('Revenue','Depreciation') ")
+		.append("AND TXN_DATE between to_date(?,'DD-MM-YYYY') ")
+		.append("and to_date(?,'DD-MM-YYYY') ")
 		.append("GROUP BY grp.main_grp, txn_date ")
 		.append("ORDER BY TO_CHAR(txn_date, 'YYYYMMDD')");
 
-		Map<String, List<Object>> listofVal = jdbcTemplate.query(SQL.toString(), new Object[] { "Revenue"/*, fromDate, toDate*/ }, new ResultSetExtractor<Map<String, List<Object>>>() {
+		Map<String, List<Object>> listofVal = jdbcTemplate.query(SQL.toString(), new Object[] { fromDate, toDate }, new ResultSetExtractor<Map<String, List<Object>>>() {
 			public Map<String, List<Object>> extractData(ResultSet rs) throws SQLException {
 				Map<String, List<Object>> data = new TreeMap<String, List<Object>>();
 				List<Object> headerRowData = new ArrayList<Object>();
@@ -78,7 +80,6 @@ public class ChartDaoImpl implements ChartDao {
 				String prevDate = "";
 
 			while (rs.next()) {
-				
 				if (!prevDate.equalsIgnoreCase(rs.getString(2))) {
 					prevDate = rs.getString(2);
 					headerRowData.add(prevDate);
@@ -89,8 +90,8 @@ public class ChartDaoImpl implements ChartDao {
 					rowData = data.get(rs.getString(1));
 				else
 					rowData = new ArrayList<Object>();
-				for (; rowData.size() < headerRowData.size();)
-					rowData.add(0);
+				for (; rowData.size() < headerRowData.size()-1;)
+					rowData.add(new Double(0.0));
 				rowData.add(rs.getDouble(3));
 				data.put(rs.getString(1), rowData);
 

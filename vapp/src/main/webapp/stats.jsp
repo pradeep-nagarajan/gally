@@ -56,7 +56,7 @@
 		
 		function generateChart(){
 			if($('#fromDate').val()!="" && $('#toDate').val()!=""){ 
-					var url='/vapp/revenue?fromDate='+$('#fromDate').val()+'&toDate='+$('#toDate').val()+'&type='+$('#reportId').val();
+					var url='/vapp/chartdata?fromDate='+$('#fromDate').val()+'&toDate='+$('#toDate').val()+'&type='+$('#reportId').val();
 					getJson(url, 'applyChart');
 			}else{
 				alert('Provide From and To date to generate Chart');
@@ -78,9 +78,16 @@
 							};
 					  dataArr.push(dataString);
 				});
-				drawDonutPieChart('piePlot',dataArr,"","Revenue",200,true);
-				drawLineChart('linePlot', result.bardata, 'line');
-				drawLineChart('barPlot', result.bardata, 'column');
+				drawDonutPieChart('piePlot',dataArr,"",$('#reportId').val(),200,true);
+				var yaxis=[];
+				if($('#reportId').val()=="Revenue"){
+					var test={"name": $('#reportId').val() ,"data":result.bardata.yaxis};
+					yaxis.push(test);
+				}else{
+					yaxis=result.bardata.yaxis;
+				}
+				drawLineChart('linePlot', result.bardata.xaxis, yaxis, 'line', false);
+				drawLineChart('barPlot', result.bardata.xaxis, yaxis, 'column', true);
 			}else{
 				$("#myTabContent").hide();
 				alert("Data NOT available!");

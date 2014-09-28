@@ -19,7 +19,7 @@ public class ChartController {
 	@Autowired
 	ChartService chartService;
 
-	@RequestMapping(value = "/revenue", method = RequestMethod.GET)
+	@RequestMapping(value = "/chartdata", method = RequestMethod.GET)
 	public @ResponseBody
 	ResponseEntity getRevenue(
 			@RequestParam(value = "callback", required = true) String callback,

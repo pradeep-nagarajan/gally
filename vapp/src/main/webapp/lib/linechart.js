@@ -1,4 +1,4 @@
-function drawLineChart(divName,dataArr, chartType){
+function drawLineChart(divName,xaxis, yaxis, chartType, stackFlag){
 	$("#"+divName).empty();
 	$("#"+divName).highcharts({
 		chart: {
@@ -11,14 +11,32 @@ function drawLineChart(divName,dataArr, chartType){
             text: null
         },
         xAxis: {
-            categories: dataArr.xaxis
+            categories: xaxis
+        },
+        yAxis: {
+        	stackLabels: {
+                enabled: stackFlag,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
         },
         credits: {
             enabled: false
         },
-        series: [ {
-            name: 'Revenue',
-            data: dataArr.yaxis
-        }]
+        plotOptions: {
+            column: {
+                stacking: stackFlag?'normal':''/*,
+                dataLabels: {
+                    enabled: stackFlag,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black, 0 0 3px black'
+                    }
+                }*/
+            }
+        },
+        series: yaxis
     });
 }
