@@ -578,7 +578,7 @@ public class VAPPServiceImpl implements VAPPService {
 		operRow = rownum;
 		
 		row = sheet.createRow(rownum++);
-		createSumRow(row, currColIndex, fillTotStyle, revenueRow, operRow,
+		createDiffRow(row, currColIndex, fillTotStyle, revenueRow, operRow,
 				rownum, "Operating Profit/(Loss)", "+");
 
 		row = sheet.createRow(rownum++);
@@ -744,6 +744,24 @@ public class VAPPServiceImpl implements VAPPService {
 				else
 					cell.setCellFormula(symb + plExcelCol[i - 1] + mainRow
 							+ "+" + plExcelCol[i - 1] + optionalRow);
+				cell.setCellStyle(fillStyle);
+			}
+		}
+	}
+	
+	public void createDiffRow(Row row, int colIndex, CellStyle fillStyle,
+			int mainRow, int optionalRow, int rownum, String name, String symb) {
+		for (int i = 0; i <= colIndex; i++) {
+			Cell cell = row.createCell(i);
+			if (i == 0) {
+				cell.setCellValue(name);
+				cell.setCellStyle(fillStyle);
+			} else {
+				if (optionalRow == 0)
+					cell.setCellValue(plExcelCol[i - 1] + mainRow);
+				else
+					cell.setCellFormula(symb + plExcelCol[i - 1] + mainRow
+							+ "-" + plExcelCol[i - 1] + optionalRow);
 				cell.setCellStyle(fillStyle);
 			}
 		}

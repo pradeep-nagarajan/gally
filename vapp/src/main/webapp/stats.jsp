@@ -78,16 +78,12 @@
 							};
 					  dataArr.push(dataString);
 				});
-				drawDonutPieChart('piePlot',dataArr,"",$('#reportId').val(),200,true);
-				var yaxis=[];
-				if($('#reportId').val()=="Revenue"){
-					var test={"name": $('#reportId').val() ,"data":result.bardata.yaxis};
-					yaxis.push(test);
-				}else{
-					yaxis=result.bardata.yaxis;
-				}
-				drawLineChart('linePlot', result.bardata.xaxis, yaxis, 'line', false);
-				drawLineChart('barPlot', result.bardata.xaxis, yaxis, 'column', true);
+				drawDonutPieChart('piePlot',dataArr,"",$('#reportId').val(),250,true);
+				drawLineChart('linePlot', result.bardata.xaxis, result.bardata.yaxis, 'line', false);
+				if($('#reportId').val()=='Operating Expense vs Revenue')
+					drawLineChart('barPlot', result.bardata.xaxis,result.bardata. yaxis, 'column', false);
+				else
+					drawLineChart('barPlot', result.bardata.xaxis,result.bardata. yaxis, 'column', true);
 			}else{
 				$("#myTabContent").hide();
 				alert("Data NOT available!");
@@ -228,6 +224,8 @@
 								<br /> Report Type: <select id="reportId">
 									<option>Revenue</option>
 									<option>Operating Expense</option>
+									<option>Operating Expense vs Revenue</option>
+									<option>Profit/Loss</option>
 									<option>MIS</option>
 								</select> <br />
 								<br />

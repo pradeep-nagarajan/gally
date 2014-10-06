@@ -44,14 +44,19 @@ public class VAPPDaoImpl implements VAPPDao {
 	static final String INSERT_IGNORE_SQL = "INSERT INTO VAPP_IGNORE_LEDGER values(?)";
 	static final String DEL_IGNORE_SQL = "DELETE FROM VAPP_IGNORE_LEDGER WHERE LEDGER=?";
 	static final String MIS_TEMP_SQL = "SELECT temp.ledger||'~`'||master.MIS_GRP misledge, TO_CHAR (txn_date, 'DD/MM/YYYY'), "
-			+ "SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) "
+			//+ "SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) "
+			+ "SUM (DECODE (master.main_grp,'Revenue', amount, DECODE (cr_dr, 'CR', '-' "
+			+ "|| amount, amount))) amount "
 			+ "FROM vapp_uploaded_temp temp, vapp_group_master master WHERE TXN_DATE between to_date(?,'DD-MM-YYYY') "
 			+ "and to_date(?,'DD-MM-YYYY') "
 			+ "and grp_mst_id=grp_id "
 			+ "group by temp.ledger||'~`'||master.MIS_GRP, txn_date "
 			+ "order by to_char(TXN_DATE,'YYYYMMDD'), misledge";
-	static final String PL_TEMP_SQL="SELECT DECODE(main_grp,'Revenue','AAAAAB',main_grp)||'~`'||MIS_GRP,TO_CHAR (txn_date, 'Mon-YY'),SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) amount "
-			+"FROM vapp_uploaded_temp, vapp_group_master "
+	static final String PL_TEMP_SQL="SELECT DECODE(main_grp,'Revenue','AAAAAB',main_grp)||'~`'||MIS_GRP,TO_CHAR (txn_date, 'Mon-YY'),"
+			//+ "SUM (DECODE (cr_dr, 'CR', '-' || amount, amount)) amount "
+			+ "SUM (DECODE (master.main_grp,'Revenue', amount, DECODE (cr_dr, 'CR', '-' "
+			+ "|| amount, amount))) amount "
+			+"FROM vapp_uploaded_temp, vapp_group_master master "
 			+"WHERE grp_mst_id = grp_id AND TXN_DATE between to_date(?,'DD-MM-YYYY') and to_date(?,'DD-MM-YYYY') "
 			//+ "AND main_grp = 'Revenue' "
 			+"group by DECODE(main_grp,'Revenue','AAAAAB',main_grp)||'~`'||MIS_GRP,TXN_DATE "

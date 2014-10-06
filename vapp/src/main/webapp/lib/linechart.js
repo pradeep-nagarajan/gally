@@ -15,7 +15,7 @@ function drawLineChart(divName,xaxis, yaxis, chartType, stackFlag){
         },
         yAxis: {
         	stackLabels: {
-                enabled: stackFlag,
+                enabled: true,
                 style: {
                     fontWeight: 'bold',
                     color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'

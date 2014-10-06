@@ -1,9 +1,8 @@
 package com.vapp.service;
 
-import java.util.List;
 import java.util.Map;
 
 public interface ChartService {
-	public Map<String, Object> getRevenue(String fromDate, String toDate);
-	public Map<String, Object> getOperatingExp(String fromDate, String toDate);
+	public Map<String, Object> getSingleData(String fromDate, String toDate, String type);
+	public Map<String, Object> getAllData(String fromDate, String toDate, String type);
 }

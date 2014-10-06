@@ -27,17 +27,17 @@ public class ChartController {
 			@RequestParam(value = "toDate", required = true) String toDate,
 			@RequestParam(value = "type", required = true) String type) {
 
-		if ("Revenue".equalsIgnoreCase(type))
+		if ("Revenue".equalsIgnoreCase(type) || "Profit/Loss".equalsIgnoreCase(type))
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getRevenue(fromDate, toDate)), new HttpHeaders(),
+					chartService.getSingleData(fromDate, toDate,type)), new HttpHeaders(),
 					HttpStatus.OK);
-		else if ("Operating Expense".equalsIgnoreCase(type))
+		else if ("Operating Expense".equalsIgnoreCase(type)  || "Operating Expense vs Revenue".equalsIgnoreCase(type))
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getOperatingExp(fromDate, toDate)), new HttpHeaders(),
+					chartService.getAllData(fromDate, toDate,type)), new HttpHeaders(),
 					HttpStatus.OK);
 		else
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getRevenue(fromDate, toDate)), new HttpHeaders(),
+					chartService.getSingleData(fromDate, toDate,type)), new HttpHeaders(),
 					HttpStatus.OK);
 	}
 
