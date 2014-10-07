@@ -27,18 +27,22 @@ public class ChartController {
 			@RequestParam(value = "toDate", required = true) String toDate,
 			@RequestParam(value = "type", required = true) String type) {
 
-		if ("Revenue".equalsIgnoreCase(type) || "Profit/Loss".equalsIgnoreCase(type))
+		if ("Revenue".equalsIgnoreCase(type)
+				|| "Profit/Loss".equalsIgnoreCase(type))
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getSingleData(fromDate, toDate,type)), new HttpHeaders(),
-					HttpStatus.OK);
-		else if ("Operating Expense".equalsIgnoreCase(type)  || "Operating Expense vs Revenue".equalsIgnoreCase(type))
+					chartService.getSingleData(fromDate, toDate, type)),
+					new HttpHeaders(), HttpStatus.OK);
+		else if ("Operating Expense".equalsIgnoreCase(type)
+				|| "Operating Expense vs Revenue".equalsIgnoreCase(type)
+				|| "Operating Expense vs Revenue vs Profit/Loss"
+						.equalsIgnoreCase(type))
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getAllData(fromDate, toDate,type)), new HttpHeaders(),
-					HttpStatus.OK);
+					chartService.getAllData(fromDate, toDate, type)),
+					new HttpHeaders(), HttpStatus.OK);
 		else
 			return new ResponseEntity(constructCallback(callback,
-					chartService.getSingleData(fromDate, toDate,type)), new HttpHeaders(),
-					HttpStatus.OK);
+					chartService.getSingleData(fromDate, toDate, type)),
+					new HttpHeaders(), HttpStatus.OK);
 	}
 
 	public String constructCallback(String callback, Object data) {

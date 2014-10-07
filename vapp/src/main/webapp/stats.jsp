@@ -80,7 +80,7 @@
 				});
 				drawDonutPieChart('piePlot',dataArr,"",$('#reportId').val(),250,true);
 				drawLineChart('linePlot', result.bardata.xaxis, result.bardata.yaxis, 'line', false);
-				if($('#reportId').val()=='Operating Expense vs Revenue')
+				if($('#reportId').val()==='Operating Expense vs Revenue' || $('#reportId').val()==='Operating Expense vs Revenue vs Profit/Loss')
 					drawLineChart('barPlot', result.bardata.xaxis,result.bardata. yaxis, 'column', false);
 				else
 					drawLineChart('barPlot', result.bardata.xaxis,result.bardata. yaxis, 'column', true);
@@ -226,7 +226,7 @@
 									<option>Operating Expense</option>
 									<option>Operating Expense vs Revenue</option>
 									<option>Profit/Loss</option>
-									<option>MIS</option>
+									<option>Operating Expense vs Revenue vs Profit/Loss</option>
 								</select> <br />
 								<br />
 								<button class="btn btn-primary" onclick="generateChart()">Generate Statistics</button>
